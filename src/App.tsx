@@ -1,4 +1,4 @@
-import { Box, Flex, Space, Title } from "@mantine/core";
+import { Badge, Box, Flex, Space, Title } from "@mantine/core";
 import { useEffect } from "react";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { Header } from "./components/Header";
@@ -42,7 +42,10 @@ function App() {
         }}
       >
         <Box id="arrrow-frame" pos="relative">
-          <Title size={70}>Lunii Admin Builder</Title>
+          <Title size={70}>
+            Lunii Admin Builder<Badge color="teal">Alpha</Badge>
+          </Title>
+
           <Header />
           <Space h={50} />
           <Flex>
