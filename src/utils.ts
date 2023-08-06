@@ -79,6 +79,7 @@ export const genrate = (state: State) => {
 
       const menuNode = {
         id: option.actionUuid,
+        name: option.actionUuid,
         options: option.options?.map((option) => option.uuid),
       };
       actionNodes.push(menuNode);
@@ -101,9 +102,11 @@ export const genrate = (state: State) => {
       // register story node
       const storyNode = {
         uuid: option.storyUuid,
+        type: "node",
         image: null,
         audio: option.storyAudioRef,
         okTransition: null,
+        name: option.uuid,
         homeTransition: {
           actionNode: parentMenuUuid,
           optionIndex: 0,
@@ -117,6 +120,8 @@ export const genrate = (state: State) => {
       uuid: option.uuid,
       image: option.titleImageRef,
       audio: option.titleAudioRef,
+      type: "node",
+      name: option.uuid,
       okTransition: {
         actionNode: option.actionUuid,
         optionIndex: 0,
@@ -140,9 +145,13 @@ export const genrate = (state: State) => {
 
   treatOption(state.initialOption);
 
+  stageNodes[0].type = "cover";
+  const packUuid = stageNodes[0].uuid;
+
   const packObject = {
     format: "v1",
-    version: 1,
+    version: 2,
+    uuid: packUuid,
 
     title: state.metadata.title,
     author: state.metadata.author,
