@@ -80,7 +80,7 @@ export const Header: FC = () => {
           }
         }}
       >
-        Génerer & télécharger
+        Générer & télécharger
       </Button>
       <Button
         variant="white"

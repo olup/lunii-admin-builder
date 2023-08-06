@@ -43,7 +43,8 @@ function App() {
       >
         <Box id="arrrow-frame" pos="relative">
           <Title size={70}>
-            Lunii Admin Builder<Badge color="teal">Alpha</Badge>
+            Lunii Admin Builder
+            <Badge color="lime">{__COMMIT_HASH__ || "xxxxx"} Alpha</Badge>
           </Title>
 
           <Header />
