@@ -32,7 +32,7 @@ function App() {
         }}
         contentStyle={{
           background: "white",
-          backgroundImage: "radial-gradient(black 1px, transparent 0)",
+          backgroundImage: "radial-gradient(#bbb 1px, transparent 0)",
           backgroundSize: "40px 40px",
           backgroundPosition: "-19px -19px",
           minHeight: "100vh",
