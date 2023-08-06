@@ -171,7 +171,7 @@ export const zipAssets = async (packObject: any) => {
   }
 
   return downloadZip([
-    new File([JSON.stringify(packObject)], "pack.json"),
+    new File([JSON.stringify(packObject)], "story.json"),
     ...files,
   ]).blob();
 };
