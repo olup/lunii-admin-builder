@@ -51,6 +51,14 @@ const storyControlSettings = {
 };
 
 export const genrate = (state: State) => {
+  if (
+    !state.metadata.title ||
+    !state.metadata.author ||
+    !state.metadata.description
+  ) {
+    throw new Error("A pack must have a title, an author and a description");
+  }
+
   // eslint-disable-next-line
   const stageNodes: any[] = [];
   // eslint-disable-next-line
@@ -192,4 +200,21 @@ export const deepCopy = <T>(obj: T): T => {
     }
   }
   return copyObj as T;
+};
+
+export const exportPack = async (state: State) => {
+  const packObject = genrate(state);
+
+  // get the ZIP stream in a Blob
+  const blob = await zipAssets(packObject);
+
+  // make and click a temporary link to download the Blob
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  const filename = state.metadata.title
+    .replace(/[^a-z0-9]/gi, "_")
+    .toLowerCase();
+  link.download = filename + ".zip";
+  link.click();
+  link.remove();
 };
