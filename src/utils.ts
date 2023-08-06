@@ -25,10 +25,7 @@ export const cleanAllUnusedAssets = async (initialOption: OptionType) => {
 
   getFiles(initialOption);
 
-  const files =
-    // eslint-disable-next-line
-    // @ts-ignore
-    (await assets.values()) as IterableIterator<FileSystemFileHandle>;
+  const files = await assets.values();
 
   for await (const file of files) {
     if (!stateFiles.includes(file.name)) {
@@ -157,13 +154,11 @@ export const genrate = (state: State) => {
 export const zipAssets = async (packObject: any) => {
   const assets = await getAssetDirectory();
   // get all files in assets
-  const fileHandles =
-    // eslint-disable-next-line
-    // @ts-ignore
-    (await assets.values()) as IterableIterator<FileSystemFileHandle>;
+  const fileHandles = await assets.values();
   const files: File[] = [];
   for await (const handle of fileHandles) {
-    const file = new File([await handle.getFile()], "assets/" + handle.name);
+    const fileHandle = await (handle as FileSystemFileHandle).getFile();
+    const file = new File([fileHandle], "assets/" + handle.name);
     files.push(file);
   }
 
