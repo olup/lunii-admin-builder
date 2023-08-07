@@ -6,7 +6,7 @@ import { MetadataCard } from "./components/MetadataCard";
 import { Option } from "./components/Option";
 import { state$ } from "./store";
 import { cleanAllUnusedAssets } from "./utils";
-import { IconBrandGithub, IconBrandGithubFilled } from "@tabler/icons-react";
+import { IconBrandGithubFilled } from "@tabler/icons-react";
 
 function App() {
   const initialOption = state$.state.initialOption.use();

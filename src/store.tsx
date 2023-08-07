@@ -32,11 +32,17 @@ export const defaultState: State = {
     description: "",
   },
   initialOption: {
-    uuid: "0",
+    uuid: crypto.randomUUID(),
     optionsType: "menu",
     titleImageRef: "",
     titleAudioRef: "",
     options: [],
+    actionUuid: crypto.randomUUID(),
+
+    // shouldn't be used as first node is always a menu
+    storyActionUuid: crypto.randomUUID(),
+    storyUuid: crypto.randomUUID(),
+    storyAudioRef: "",
   },
 };
 export const state$ = observable<{
