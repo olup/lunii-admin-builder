@@ -64,57 +64,48 @@ export const genrate = (state: State) => {
   // eslint-disable-next-line
   const actionNodes: any[] = [];
 
-  const treatOption = (option: OptionType, parentMenuUuid?: string) => {
+  function findParentActionNode(
+    stageNodeUuid: string
+  ): [string, number] | null {
+    const node = actionNodes.find((actionNode) =>
+      actionNode.options.includes(stageNodeUuid)
+    );
+    if (!node) return null;
+
+    const nodeIndex = node.options.findIndex(
+      (n: string) => n === stageNodeUuid
+    );
+    return [node.id, nodeIndex];
+  }
+
+  function findParentStageNode(actionNodeUuid: string): string | null {
+    const node = stageNodes.find(
+      (stageNode) => stageNode.okTransition?.actionNode === actionNodeUuid
+    );
+    return node ? node.uuid : null;
+  }
+
+  function findBackMenuUuid(stageNodeUuid: string): [string, number] | null {
+    // is there a parent node ?
+    const parentAction = findParentActionNode(stageNodeUuid);
+    const parentStageUuid = parentAction
+      ? findParentStageNode(parentAction[0])
+      : null;
+    // is there a parent menu to this node ?
+    const topActionUuid = parentStageUuid
+      ? findParentActionNode(parentStageUuid)
+      : null;
+
+    return topActionUuid;
+  }
+
+  const treatOption = (option: OptionType) => {
     // control that the option has a title image and audio
     if (!option.titleImageRef || !option.titleAudioRef) {
       throw new Error("A menu must have a title image and audio");
     }
 
-    // if the node leads to a menu we register the coming menu
-    if (option.optionsType === "menu") {
-      // control that it has sub nodes
-      if (option.options?.length === 0) {
-        throw new Error("A menu must have at least one sub node");
-      }
-
-      const menuNode = {
-        id: option.actionUuid,
-        name: option.actionUuid,
-        options: option.options?.map((option) => option.uuid),
-      };
-      actionNodes.push(menuNode);
-    }
-
-    // if the node leads to a story we register the coming story with its
-    // single item  menu
-    if (option.optionsType === "story") {
-      if (!option.storyAudioRef) {
-        throw new Error("A story must have an audio");
-      }
-
-      // register single item menu
-      const menuNode = {
-        id: option.storyActionUuid,
-        options: [option.storyUuid],
-      };
-      actionNodes.push(menuNode);
-
-      // register story node
-      const storyNode = {
-        uuid: option.storyUuid,
-        type: "node",
-        image: null,
-        audio: option.storyAudioRef,
-        okTransition: null,
-        name: option.uuid,
-        homeTransition: {
-          actionNode: parentMenuUuid,
-          optionIndex: 0,
-        },
-        controlSettings: storyControlSettings,
-      };
-      stageNodes.push(storyNode);
-    }
+    const backMenu = findBackMenuUuid(option.uuid);
 
     const stageNode = {
       uuid: option.uuid,
@@ -126,10 +117,10 @@ export const genrate = (state: State) => {
         actionNode: option.actionUuid,
         optionIndex: 0,
       },
-      homeTransition: parentMenuUuid
+      homeTransition: backMenu
         ? {
-            actionNode: parentMenuUuid,
-            optionIndex: 0,
+            actionNode: backMenu[0],
+            optionIndex: backMenu[1],
           }
         : null,
       controlSettings: menuControlSettings,
@@ -137,10 +128,60 @@ export const genrate = (state: State) => {
 
     stageNodes.push(stageNode);
 
-    // If the option leads to a menu, we treat each of its subNodes
-    option.options?.forEach((option) => {
-      treatOption(option, option.actionUuid);
-    });
+    // if the node leads to a menu we register the coming menu
+    if (option.optionsType === "menu") {
+      // control that it has sub nodes
+      if (option.options?.length === 0) {
+        throw new Error("A menu must have at least one sub node");
+      }
+
+      const actionNode = {
+        id: option.actionUuid,
+        name: option.actionUuid,
+        options: option.options?.map((option) => option.uuid),
+      };
+      actionNodes.push(actionNode);
+
+      // treat sub nodes
+      option.options?.forEach((subOption) => {
+        treatOption(subOption);
+      });
+    }
+
+    // if the node leads to a story we register the coming story with its
+    // single item  menu
+    if (option.optionsType === "story") {
+      if (!option.storyAudioRef) {
+        throw new Error("A story must have an audio");
+      }
+
+      // register single item menu
+      const menuNode = {
+        id: option.actionUuid,
+        options: [option.storyUuid],
+      };
+      actionNodes.push(menuNode);
+
+      const backMenu = findBackMenuUuid(option.storyUuid!);
+
+      // register story node
+      const storyNode = {
+        uuid: option.storyUuid,
+        type: "node",
+        image: null,
+        audio: option.storyAudioRef,
+        okTransition: null,
+        name: option.storyUuid,
+        homeTransition: backMenu
+          ? {
+              actionNode: backMenu[0],
+              optionIndex: backMenu[1],
+            }
+          : null,
+        controlSettings: storyControlSettings,
+      };
+      stageNodes.push(storyNode);
+    }
   };
 
   treatOption(state.initialOption);
@@ -162,6 +203,8 @@ export const genrate = (state: State) => {
     stageNodes,
     actionNodes,
   };
+
+  console.log(packObject);
 
   return packObject;
 };
@@ -224,6 +267,6 @@ export const exportPack = async (state: State) => {
     .replace(/[^a-z0-9]/gi, "_")
     .toLowerCase();
   link.download = filename + ".zip";
-  link.click();
+  // link.click();
   link.remove();
 };

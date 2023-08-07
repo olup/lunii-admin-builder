@@ -12,7 +12,6 @@ export type OptionType = {
   titleImageRef?: string;
   titleAudioRef?: string;
 
-  storyActionUuid?: string;
   storyUuid?: string;
   storyAudioRef?: string;
 
@@ -40,7 +39,6 @@ export const defaultState: State = {
     actionUuid: crypto.randomUUID(),
 
     // shouldn't be used as first node is always a menu
-    storyActionUuid: crypto.randomUUID(),
     storyUuid: crypto.randomUUID(),
     storyAudioRef: "",
   },

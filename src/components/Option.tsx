@@ -30,7 +30,6 @@ export const Option: FC<{
       storyAudioRef: "",
       options: [],
 
-      storyActionUuid: crypto.randomUUID(),
       actionUuid: crypto.randomUUID(),
       storyUuid: crypto.randomUUID(),
     };
