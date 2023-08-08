@@ -23,3 +23,17 @@ export const deepCopy = <T>(obj: T): T => {
   }
   return copyObj as T;
 };
+
+export const getImageFromClipboard = async (): Promise<Blob | undefined> => {
+  const items = await navigator.clipboard.read().catch(() => {
+    throw new Error("Cannot read clipboard data in this context");
+  });
+
+  for (const item of items) {
+    for (const type of item.types) {
+      if (type.startsWith("image/")) {
+        return item.getType(type);
+      }
+    }
+  }
+};

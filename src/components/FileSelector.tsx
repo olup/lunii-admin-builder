@@ -15,6 +15,8 @@ import { getAssetDirectory } from "../utils/fs";
 import { FileInput } from "./FileInput";
 import { Player } from "./Player";
 import { nanoid } from "nanoid";
+import { getImageFromClipboard } from "../utils/misc";
+import { notifications } from "@mantine/notifications";
 
 const loadFile = async (
   file: File | null,
@@ -49,10 +51,33 @@ export const ImageSelector: FC<{
   onChange: (value: string | null) => void;
 }> = ({ value, onChange }) => {
   const [url, setUrl] = useState<string | null>(null);
+
   useEffect(() => {
     if (!value) return;
     getFileUrlValue(value).then((v) => setUrl(v));
   }, [value]);
+
+  const loadFromClipboard = async () => {
+    try {
+      const imageBlob = await getImageFromClipboard();
+      if (!imageBlob) {
+        notifications.show({
+          title: "Le clipboard ne contient pas d'image",
+          message: "",
+          color: "yellow",
+        });
+        return;
+      }
+      await loadFile(new File([imageBlob], "x.jpeg"), onChange);
+    } catch (e) {
+      console.error(e);
+      notifications.show({
+        title: "Impossible de copier depuis le clipboard",
+        message: (e as Error).message,
+        color: "red",
+      });
+    }
+  };
 
   if (value) {
     return (
@@ -99,7 +124,10 @@ export const ImageSelector: FC<{
             <Menu.Item disabled icon={<IconLink size={14} />}>
               Depuis une URL
             </Menu.Item>
-            <Menu.Item disabled icon={<IconClipboard size={14} />}>
+            <Menu.Item
+              icon={<IconClipboard size={14} />}
+              onClick={loadFromClipboard}
+            >
               Depuis le clipboard
             </Menu.Item>
             <Menu.Item disabled icon={<IconAlphabetLatin size={14} />}>
