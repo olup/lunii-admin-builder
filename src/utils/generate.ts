@@ -77,7 +77,7 @@ export const genrate = (state: State) => {
       uuid: option.uuid,
       image: option.titleImageRef,
       audio: option.titleAudioRef,
-      type: "node",
+      type: "stage",
       name: option.uuid,
       okTransition: {
         actionNode: option.actionUuid,
@@ -133,7 +133,7 @@ export const genrate = (state: State) => {
       // register story node
       const storyNode = {
         uuid: option.storyUuid,
-        type: "node",
+        type: "stage",
         image: null,
         audio: option.storyAudioRef,
         okTransition: null,
