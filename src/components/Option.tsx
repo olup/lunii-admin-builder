@@ -11,7 +11,7 @@ import { OptionType } from "../store";
 import { AudioSelector, ImageSelector } from "./FileSelector";
 import { IconPlus } from "@tabler/icons-react";
 import { Arrow } from "./Arrow";
-import { deepCopy } from "../utils";
+import { deepCopy } from "../utils/misc";
 
 export const Option: FC<{
   option: OptionType;

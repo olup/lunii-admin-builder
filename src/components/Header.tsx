@@ -4,7 +4,7 @@ import { notifications } from "@mantine/notifications";
 import { IconDownload, IconPlus, IconUpload } from "@tabler/icons-react";
 import { FC } from "react";
 import { resetState, state$ } from "../store";
-import { exportPack } from "../utils";
+import { exportPack } from "../utils/fs";
 
 export const Header: FC = () => {
   const openResetModal = () =>
@@ -69,7 +69,7 @@ export const Header: FC = () => {
         rightIcon={<IconDownload size={18} />}
         onClick={async () => {
           try {
-            exportPack(state$.state.peek());
+            await exportPack(state$.state.peek());
           } catch (e) {
             console.error(e);
             notifications.show({

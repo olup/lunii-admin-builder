@@ -18,7 +18,9 @@
     "@mantine/modals": "^6.0.17",
     "@mantine/notifications": "^6.0.17",
     "@tabler/icons-react": "^2.30.0",
-    "client-zip": "^2.4.4",
+    "@types/file-saver": "^2.0.5",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-zoom-pan-pinch": "^3.1.0"

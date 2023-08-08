@@ -4,7 +4,7 @@ import {
   persistObservable,
 } from "@legendapp/state/persist";
 import { ObservablePersistLocalStorage } from "@legendapp/state/persist-plugins/local-storage";
-import { deepCopy } from "./utils";
+import { deepCopy } from "./utils/misc";
 
 export type OptionType = {
   uuid: string;

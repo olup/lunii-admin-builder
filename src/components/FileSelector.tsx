@@ -1,7 +1,7 @@
 import { ActionIcon, AspectRatio, Box, Center } from "@mantine/core";
 import { IconMusic, IconPhoto, IconX } from "@tabler/icons-react";
 import { FC, useEffect, useState } from "react";
-import { getAssetDirectory } from "../utils";
+import { getAssetDirectory } from "../utils/fs";
 import { FileInput } from "./FileInput";
 import { Player } from "./Player";
 

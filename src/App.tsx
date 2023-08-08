@@ -5,7 +5,7 @@ import { Header } from "./components/Header";
 import { MetadataCard } from "./components/MetadataCard";
 import { Option } from "./components/Option";
 import { state$ } from "./store";
-import { cleanAllUnusedAssets } from "./utils";
+import { cleanAllUnusedAssets } from "./utils/fs";
 import { IconBrandGithubFilled } from "@tabler/icons-react";
 
 function App() {
