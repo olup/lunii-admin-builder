@@ -1,9 +1,20 @@
-import { ActionIcon, AspectRatio, Box, Center } from "@mantine/core";
-import { IconMusic, IconPhoto, IconX } from "@tabler/icons-react";
+import { ActionIcon, AspectRatio, Box, Center, Menu } from "@mantine/core";
+import {
+  IconAlphabetLatin,
+  IconClipboard,
+  IconDots,
+  IconLink,
+  IconMessage,
+  IconMicrophone,
+  IconMusic,
+  IconPhoto,
+  IconX,
+} from "@tabler/icons-react";
 import { FC, useEffect, useState } from "react";
 import { getAssetDirectory } from "../utils/fs";
 import { FileInput } from "./FileInput";
 import { Player } from "./Player";
+import { nanoid } from "nanoid";
 
 const loadFile = async (
   file: File | null,
@@ -12,15 +23,18 @@ const loadFile = async (
   if (!file) return;
 
   const assets = await getAssetDirectory();
+  const fileName = nanoid();
+  const fileExt = file.name.split(".").pop();
+  const filePath = `${fileName}.${fileExt}`;
 
-  const localFile = await assets.getFileHandle(`${file.name}`, {
+  const localFile = await assets.getFileHandle(filePath, {
     create: true,
   });
   const writer = await localFile.createWritable();
   await writer.write(await file.arrayBuffer());
   await writer.close();
 
-  onChange(file.name);
+  onChange(filePath);
 };
 
 const getFileUrlValue = async (fileName: string) => {
@@ -62,16 +76,39 @@ export const ImageSelector: FC<{
   }
 
   return (
-    <FileInput
-      onChange={(file) => loadFile(file, onChange)}
-      accept="image/jpeg,image/jpg,image/png,image/bmp"
-    >
-      <AspectRatio ratio={360 / 240}>
-        <Center h="100%">
-          <IconPhoto size={40} />
-        </Center>
-      </AspectRatio>
-    </FileInput>
+    <Box pos="relative">
+      <FileInput
+        onChange={(file) => loadFile(file, onChange)}
+        accept="image/jpeg,image/jpg,image/png,image/bmp"
+      >
+        <AspectRatio ratio={360 / 240}>
+          <Center h="100%">
+            <IconPhoto size={40} />
+          </Center>
+        </AspectRatio>
+      </FileInput>
+
+      <Box pos="absolute" top={5} right={15}>
+        <Menu position="bottom-start">
+          <Menu.Target>
+            <ActionIcon>
+              <IconDots />
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item disabled icon={<IconLink size={14} />}>
+              Depuis une URL
+            </Menu.Item>
+            <Menu.Item disabled icon={<IconClipboard size={14} />}>
+              Depuis le clipboard
+            </Menu.Item>
+            <Menu.Item disabled icon={<IconAlphabetLatin size={14} />}>
+              Depuis du texte
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+      </Box>
+    </Box>
   );
 };
 
@@ -109,13 +146,35 @@ export const AudioSelector: FC<{
   }
 
   return (
-    <FileInput
-      onChange={(file) => loadFile(file, onChange)}
-      accept="audio/mp3,audio/ogg,audio/wav"
-    >
-      <Center h={100}>
-        <IconMusic size={40} />
-      </Center>
-    </FileInput>
+    <Box pos="relative">
+      <FileInput
+        onChange={(file) => loadFile(file, onChange)}
+        accept="audio/mp3,audio/ogg,audio/wav"
+      >
+        <Center h={100}>
+          <IconMusic size={40} />
+        </Center>
+      </FileInput>
+      <Box pos="absolute" top={5} right={15}>
+        <Menu position="bottom-start">
+          <Menu.Target>
+            <ActionIcon>
+              <IconDots />
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item disabled icon={<IconLink size={14} />}>
+              Depuis une URL
+            </Menu.Item>
+            <Menu.Item disabled icon={<IconMicrophone size={14} />}>
+              Depuis le micro
+            </Menu.Item>
+            <Menu.Item disabled icon={<IconMessage size={14} />}>
+              Depuis du texte (synthèse)
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+      </Box>
+    </Box>
   );
 };
