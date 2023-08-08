@@ -13,5 +13,7 @@ export const zipAssets = async (packObject: any) => {
     const fileHandle = await (handle as FileSystemFileHandle).getFile();
     zip.file("assets/" + handle.name, fileHandle);
   }
+
+  zip.file("story.json", JSON.stringify(packObject));
   return zip.generateAsync({ type: "blob" });
 };
