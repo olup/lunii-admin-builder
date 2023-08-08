@@ -267,6 +267,6 @@ export const exportPack = async (state: State) => {
     .replace(/[^a-z0-9]/gi, "_")
     .toLowerCase();
   link.download = filename + ".zip";
-  // link.click();
+  link.click();
   link.remove();
 };
