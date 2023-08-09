@@ -1,3 +1,5 @@
+import { customAlphabet } from "nanoid";
+
 export const deepCopy = <T>(obj: T): T => {
   if (obj === null || typeof obj !== "object") {
     return obj;
@@ -37,3 +39,9 @@ export const getImageFromClipboard = async (): Promise<Blob | undefined> => {
     }
   }
 };
+
+export const getRandomFileName = () =>
+  customAlphabet(
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+    10
+  )();

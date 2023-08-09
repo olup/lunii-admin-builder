@@ -1,5 +1,6 @@
 import { OptionType, State } from "../store";
 import { genrate } from "./generate";
+import { getRandomFileName } from "./misc";
 import { zipAssets } from "./zip";
 import { saveAs } from "file-saver";
 
@@ -43,4 +44,22 @@ export const exportPack = async (state: State) => {
     .replace(/[^a-z0-9]/gi, "_")
     .toLowerCase();
   saveAs(blob, filename + ".zip");
+};
+
+export const loadFile = async (file: File | null): Promise<string> => {
+  if (!file) throw new Error("No file provided");
+
+  const assets = await getAssetDirectory();
+  const fileName = getRandomFileName();
+  const fileExt = file.name.split(".").pop();
+  const filePath = `${fileName}.${fileExt}`;
+
+  const localFile = await assets.getFileHandle(filePath, {
+    create: true,
+  });
+  const writer = await localFile.createWritable();
+  await writer.write(await file.arrayBuffer());
+  await writer.close();
+
+  return filePath;
 };

@@ -1,4 +1,5 @@
 import { ActionIcon, AspectRatio, Box, Center, Menu } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import {
   IconAlphabetLatin,
   IconClipboard,
@@ -11,33 +12,10 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { FC, useEffect, useState } from "react";
-import { getAssetDirectory } from "../utils/fs";
+import { getAssetDirectory, loadFile } from "../utils/fs";
+import { getImageFromClipboard } from "../utils/misc";
 import { FileInput } from "./FileInput";
 import { Player } from "./Player";
-import { nanoid } from "nanoid";
-import { getImageFromClipboard } from "../utils/misc";
-import { notifications } from "@mantine/notifications";
-
-const loadFile = async (
-  file: File | null,
-  onChange: (fileName: string) => void
-) => {
-  if (!file) return;
-
-  const assets = await getAssetDirectory();
-  const fileName = nanoid();
-  const fileExt = file.name.split(".").pop();
-  const filePath = `${fileName}.${fileExt}`;
-
-  const localFile = await assets.getFileHandle(filePath, {
-    create: true,
-  });
-  const writer = await localFile.createWritable();
-  await writer.write(await file.arrayBuffer());
-  await writer.close();
-
-  onChange(filePath);
-};
 
 const getFileUrlValue = async (fileName: string) => {
   const assets = await getAssetDirectory();
@@ -68,7 +46,7 @@ export const ImageSelector: FC<{
         });
         return;
       }
-      await loadFile(new File([imageBlob], "x.jpeg"), onChange);
+      await onChange(await loadFile(new File([imageBlob], "x.jpeg")));
     } catch (e) {
       console.error(e);
       notifications.show({
@@ -103,7 +81,7 @@ export const ImageSelector: FC<{
   return (
     <Box pos="relative">
       <FileInput
-        onChange={(file) => loadFile(file, onChange)}
+        onChange={async (file) => await onChange(await loadFile(file))}
         accept="image/jpeg,image/jpg,image/png,image/bmp"
       >
         <AspectRatio ratio={360 / 240}>
@@ -176,7 +154,7 @@ export const AudioSelector: FC<{
   return (
     <Box pos="relative">
       <FileInput
-        onChange={(file) => loadFile(file, onChange)}
+        onChange={async (file) => await onChange(await loadFile(file))}
         accept="audio/mp3,audio/ogg,audio/wav"
       >
         <Center h={100}>
