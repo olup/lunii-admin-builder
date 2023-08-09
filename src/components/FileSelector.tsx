@@ -47,7 +47,7 @@ export const ImageSelector: FC<{
         });
         return;
       }
-      const resizedImageBlob = await resizeImage(imageBlob, 360, 240);
+      const resizedImageBlob = await resizeImage(imageBlob, 320, 240);
       await onChange(await loadFile(new File([resizedImageBlob], "x.png")));
     } catch (e) {
       console.error(e);
@@ -62,7 +62,7 @@ export const ImageSelector: FC<{
   if (value) {
     return (
       <Box pos="relative">
-        <AspectRatio ratio={360 / 240}>
+        <AspectRatio ratio={320 / 240}>
           {url && <img src={url} alt={value} />}
         </AspectRatio>
         <ActionIcon
@@ -84,7 +84,7 @@ export const ImageSelector: FC<{
     <Box pos="relative">
       <FileInput
         onChange={async (file) => {
-          const resizedImageBlob = await resizeImage(file, 360, 240);
+          const resizedImageBlob = await resizeImage(file, 320, 240);
           const resizedImageFile = new File([resizedImageBlob], "x.png", {
             type: file.type,
             lastModified: Date.now(),
@@ -93,7 +93,7 @@ export const ImageSelector: FC<{
         }}
         accept="image/jpeg,image/jpg,image/png,image/bmp"
       >
-        <AspectRatio ratio={360 / 240}>
+        <AspectRatio ratio={320 / 240}>
           <Center h="100%">
             <IconPhoto size={40} />
           </Center>
