@@ -16,6 +16,7 @@ import { getAssetDirectory, loadFile } from "../utils/fs";
 import { getImageFromClipboard } from "../utils/misc";
 import { FileInput } from "./FileInput";
 import { Player } from "./Player";
+import { resizeImage } from "../utils/image";
 
 const getFileUrlValue = async (fileName: string) => {
   const assets = await getAssetDirectory();
@@ -46,7 +47,8 @@ export const ImageSelector: FC<{
         });
         return;
       }
-      await onChange(await loadFile(new File([imageBlob], "x.jpeg")));
+      const resizedImageBlob = await resizeImage(imageBlob, 360, 240);
+      await onChange(await loadFile(new File([resizedImageBlob], "x.png")));
     } catch (e) {
       console.error(e);
       notifications.show({
@@ -81,7 +83,14 @@ export const ImageSelector: FC<{
   return (
     <Box pos="relative">
       <FileInput
-        onChange={async (file) => await onChange(await loadFile(file))}
+        onChange={async (file) => {
+          const resizedImageBlob = await resizeImage(file, 360, 240);
+          const resizedImageFile = new File([resizedImageBlob], "x.png", {
+            type: file.type,
+            lastModified: Date.now(),
+          });
+          await onChange(await loadFile(resizedImageFile));
+        }}
         accept="image/jpeg,image/jpg,image/png,image/bmp"
       >
         <AspectRatio ratio={360 / 240}>
