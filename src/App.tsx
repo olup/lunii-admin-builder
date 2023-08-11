@@ -1,4 +1,5 @@
 import { ActionIcon, Badge, Box, Flex, Space, Title } from "@mantine/core";
+import { IconBrandGithubFilled } from "@tabler/icons-react";
 import { useEffect } from "react";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { Header } from "./components/Header";
@@ -6,7 +7,6 @@ import { MetadataCard } from "./components/MetadataCard";
 import { Option } from "./components/Option";
 import { state$ } from "./store";
 import { cleanAllUnusedAssets } from "./utils/fs";
-import { IconBrandGithubFilled } from "@tabler/icons-react";
 
 function App() {
   const initialOption = state$.state.initialOption.use();

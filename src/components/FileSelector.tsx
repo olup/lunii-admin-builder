@@ -17,6 +17,7 @@ import { getImageFromClipboard } from "../utils/misc";
 import { FileInput } from "./FileInput";
 import { Player } from "./Player";
 import { resizeImage } from "../utils/image";
+import { showRecorderModal } from "./Recorder";
 
 const getFileUrlValue = async (fileName: string) => {
   const assets = await getAssetDirectory();
@@ -108,14 +109,11 @@ export const ImageSelector: FC<{
             </ActionIcon>
           </Menu.Target>
           <Menu.Dropdown>
-            <Menu.Item disabled icon={<IconLink size={14} />}>
-              Depuis une URL
-            </Menu.Item>
             <Menu.Item
               icon={<IconClipboard size={14} />}
               onClick={loadFromClipboard}
             >
-              Depuis le clipboard
+              Coller epuis le clipboard
             </Menu.Item>
             <Menu.Item disabled icon={<IconAlphabetLatin size={14} />}>
               Depuis du texte
@@ -181,7 +179,16 @@ export const AudioSelector: FC<{
             <Menu.Item disabled icon={<IconLink size={14} />}>
               Depuis une URL
             </Menu.Item>
-            <Menu.Item disabled icon={<IconMicrophone size={14} />}>
+            <Menu.Item
+              icon={<IconMicrophone size={14} />}
+              onClick={() =>
+                showRecorderModal(async (url) => {
+                  const blob = await fetch(url).then((r) => r.blob());
+                  const file = await loadFile(new File([blob], "x.wav"));
+                  await onChange(file);
+                })
+              }
+            >
               Depuis le micro
             </Menu.Item>
             <Menu.Item disabled icon={<IconMessage size={14} />}>

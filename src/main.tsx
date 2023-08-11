@@ -9,7 +9,7 @@ enableReactUse();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <MantineProvider>
+    <MantineProvider withGlobalStyles withNormalizeCSS>
       <ModalsProvider>
         <Notifications />
         <App />
