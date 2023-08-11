@@ -1,7 +1,12 @@
 import { Box, Button, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { IconDownload, IconPlus, IconUpload } from "@tabler/icons-react";
+import {
+  IconDownload,
+  IconExternalLink,
+  IconPlus,
+  IconUpload,
+} from "@tabler/icons-react";
 import { FC } from "react";
 import { resetState, state$ } from "../store";
 import { exportPack } from "../utils/fs";
@@ -21,24 +26,6 @@ export const Header: FC = () => {
       confirmProps: { color: "teal" },
       onCancel: () => {},
       onConfirm: () => resetState(),
-    });
-
-  const openInstallHelpModal = () =>
-    modals.openConfirmModal({
-      title: <Text fw={700}>Aide : installer un pack</Text>,
-      centered: true,
-      children: (
-        <>
-          <Text size="sm">
-            Une fois généré et téléchargé, vous pouvez installer votre pack
-            d'histoire sur votre Lunii à l'aide de l'appliacation Lunii Admin.
-          </Text>
-        </>
-      ),
-      labels: { confirm: "Telecharger Lunii Admin", cancel: "Fermer" },
-      confirmProps: { color: "teal" },
-      onCancel: () => {},
-      onConfirm: () => window.open("https://github.com/olup/lunii-admin"),
     });
 
   return (
@@ -85,9 +72,12 @@ export const Header: FC = () => {
       <Button
         variant="white"
         color="gray"
-        onClick={() => openInstallHelpModal()}
+        leftIcon={<IconExternalLink size={18} />}
+        component="a"
+        href="https://lunii-admin-web.pages.dev"
+        target="_blank"
       >
-        Comment installer mon pack sur la lunii ?
+        Installer sur ma Lunii
       </Button>
     </Box>
   );
