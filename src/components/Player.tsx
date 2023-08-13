@@ -26,7 +26,7 @@ export const Player: FC<{ url: string }> = ({ url }) => {
 
   return (
     <ActionIcon
-      variant="outline"
+      variant="filled"
       color="gray"
       size="xl"
       onClick={() => {

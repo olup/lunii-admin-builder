@@ -4,8 +4,8 @@ import {
   IconAlphabetLatin,
   IconClipboard,
   IconDots,
+  IconExternalLink,
   IconLink,
-  IconMessage,
   IconMicrophone,
   IconMusic,
   IconPhoto,
@@ -13,11 +13,12 @@ import {
 } from "@tabler/icons-react";
 import { FC, useEffect, useState } from "react";
 import { getAssetDirectory, loadFile } from "../utils/fs";
+import { resizeImage } from "../utils/image";
 import { getImageFromClipboard } from "../utils/misc";
 import { FileInput } from "./FileInput";
 import { Player } from "./Player";
-import { resizeImage } from "../utils/image";
 import { showRecorderModal } from "./Recorder";
+import { showTtsModal } from "./Tts";
 
 const getFileUrlValue = async (fileName: string) => {
   const assets = await getAssetDirectory();
@@ -183,6 +184,7 @@ export const AudioSelector: FC<{
               icon={<IconMicrophone size={14} />}
               onClick={() =>
                 showRecorderModal(async (url) => {
+                  if (!url) return;
                   const blob = await fetch(url).then((r) => r.blob());
                   const file = await loadFile(new File([blob], "x.wav"));
                   await onChange(file);
@@ -191,7 +193,15 @@ export const AudioSelector: FC<{
             >
               Depuis le micro
             </Menu.Item>
-            <Menu.Item disabled icon={<IconMessage size={14} />}>
+            <Menu.Item
+              icon={<IconExternalLink size={14} />}
+              onClick={() =>
+                showTtsModal(async (blob) => {
+                  const file = await loadFile(new File([blob], "x.mp3"));
+                  await onChange(file);
+                })
+              }
+            >
               Depuis du texte (synthèse)
             </Menu.Item>
           </Menu.Dropdown>
