@@ -5,7 +5,6 @@ import {
   IconClipboard,
   IconDots,
   IconExternalLink,
-  IconLink,
   IconMicrophone,
   IconMusic,
   IconPhoto,
@@ -27,16 +26,20 @@ const getFileUrlValue = async (fileName: string) => {
   return URL.createObjectURL(file);
 };
 
+const useGetFileUrlValue = (fileName: string | undefined) => {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!fileName) setUrl(null);
+    else getFileUrlValue(fileName).then((v) => setUrl(v));
+  }, [fileName]);
+  return url;
+};
+
 export const ImageSelector: FC<{
   value?: string;
   onChange: (value: string | null) => void;
 }> = ({ value, onChange }) => {
-  const [url, setUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!value) return;
-    getFileUrlValue(value).then((v) => setUrl(v));
-  }, [value]);
+  const url = useGetFileUrlValue(value);
 
   const loadFromClipboard = async () => {
     try {
@@ -130,11 +133,7 @@ export const AudioSelector: FC<{
   value?: string;
   onChange: (value: string | null) => void;
 }> = ({ value, onChange }) => {
-  const [url, setUrl] = useState<string | null>(null);
-  useEffect(() => {
-    if (!value) return;
-    getFileUrlValue(value).then((v) => setUrl(v));
-  }, [value]);
+  const url = useGetFileUrlValue(value);
 
   if (value) {
     return (
@@ -177,9 +176,6 @@ export const AudioSelector: FC<{
             </ActionIcon>
           </Menu.Target>
           <Menu.Dropdown>
-            <Menu.Item disabled icon={<IconLink size={14} />}>
-              Depuis une URL
-            </Menu.Item>
             <Menu.Item
               icon={<IconMicrophone size={14} />}
               onClick={() =>
