@@ -18,6 +18,7 @@ import { FileInput } from "./FileInput";
 import { Player } from "./Player";
 import { showRecorderModal } from "./Recorder";
 import { showTtsModal } from "./Tts";
+import { openTextImageCreator } from "./TextImageCreator";
 
 const getFileUrlValue = async (fileName: string) => {
   const assets = await getAssetDirectory();
@@ -40,6 +41,13 @@ export const ImageSelector: FC<{
   onChange: (value: string | null) => void;
 }> = ({ value, onChange }) => {
   const url = useGetFileUrlValue(value);
+
+  const loadFromImageCreator = async () =>
+    openTextImageCreator(async (blob) => {
+      if (!blob) return;
+      const file = await loadFile(new File([blob], "x.png"));
+      onChange(file);
+    });
 
   const loadFromClipboard = async () => {
     try {
@@ -119,8 +127,11 @@ export const ImageSelector: FC<{
             >
               Coller epuis le clipboard
             </Menu.Item>
-            <Menu.Item disabled icon={<IconAlphabetLatin size={14} />}>
-              Depuis du texte
+            <Menu.Item
+              icon={<IconAlphabetLatin size={14} />}
+              onClick={loadFromImageCreator}
+            >
+              Depuis du texte (créateur d'image)
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>
