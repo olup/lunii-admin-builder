@@ -1,5 +1,6 @@
 import { Box, Button, Flex, Space, TextInput } from "@mantine/core";
-import { useEffect, useRef, useState } from "react";
+import { modals } from "@mantine/modals";
+import { FC, useEffect, useRef, useState } from "react";
 
 function wrapText(
   text: string,
@@ -35,7 +36,7 @@ const write = (ctx: CanvasRenderingContext2D, text: string) => {
   let fontSize = initialFontSize;
   let lines: string[] = [];
 
-  while (true) {
+  while (fontSize > 0) {
     ctx.font = `${fontSize}px serif`;
     lines = wrapText(text, width - 20, ctx);
     const textHeight = lines.length * fontSize;
@@ -45,10 +46,10 @@ const write = (ctx: CanvasRenderingContext2D, text: string) => {
     else fontSize -= 1;
   }
 
-  const lineHeight = ctx.measureText("M").width;
+  const fontHeight = ctx.measureText("M").width;
+  const lineHeight = fontHeight * 1.2;
   const textHeight = lines.length * lineHeight;
-  console.log(textHeight);
-  const start = (height - textHeight) / 2 + lineHeight;
+  const start = (height - textHeight) / 2 + fontHeight;
 
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, width, height);
@@ -61,7 +62,9 @@ const write = (ctx: CanvasRenderingContext2D, text: string) => {
   });
 };
 
-export const TextImageCreator = () => {
+export const TextImageCreator: FC<{ onSave: (blob: Blob | null) => void }> = ({
+  onSave,
+}) => {
   const [text, setText] = useState("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -91,8 +94,29 @@ export const TextImageCreator = () => {
       ></canvas>
       <Space h={10} />
       <Flex justify="right">
-        <Button color="green">Valider</Button>
+        <Button
+          color="green"
+          onClick={() => {
+            canvasRef.current?.toBlob(onSave);
+          }}
+        >
+          Enregistrer
+        </Button>
       </Flex>
     </Box>
   );
+};
+
+export const openTextImageCreator = (onSave: (blob: Blob | null) => void) => {
+  modals.open({
+    title: "Créer une image avec du texte",
+    children: (
+      <TextImageCreator
+        onSave={(b) => {
+          onSave(b);
+          modals.closeAll();
+        }}
+      />
+    ),
+  });
 };

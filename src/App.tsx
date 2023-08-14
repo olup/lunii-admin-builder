@@ -7,7 +7,6 @@ import { MetadataCard } from "./components/MetadataCard";
 import { Option } from "./components/Option";
 import { state$ } from "./store";
 import { cleanAllUnusedAssets } from "./utils/fs";
-import { TextImageCreator } from "./components/TextImageCreator";
 
 function App() {
   const initialOption = state$.state.initialOption.use();
@@ -15,8 +14,6 @@ function App() {
   useEffect(() => {
     state$.ui.redrawArrow.set(state$.ui.redrawArrow.peek() + 1);
   }, [initialOption]);
-
-  return <TextImageCreator />;
 
   return (
     <>
