@@ -58,6 +58,27 @@ export const Header: FC = () => {
     }
   );
 
+  const openImportModal = () =>
+    modals.openConfirmModal({
+      title: <Text>Ouvrir un Pack</Text>,
+      centered: true,
+      children: (
+        <>
+          <Text size="sm">
+            En ouvrant un nouveau pack, le travail non sauvegardé sera perdu.
+          </Text>
+          <Text size="sm">
+            Pour le moment Luniii Admin Builder ne peut ouvrir que les packs
+            qu'il a permis de créer.
+          </Text>
+        </>
+      ),
+      labels: { confirm: "Importer", cancel: "Annuler" },
+      confirmProps: { color: "teal" },
+      onCancel: () => {},
+      onConfirm: () => doImportPack(),
+    });
+
   return (
     <Box p={5} display="inline-flex" bg="white">
       <Button
@@ -76,7 +97,7 @@ export const Header: FC = () => {
         variant="outline"
         color="gray"
         rightIcon={<IconUpload size={18} />}
-        onClick={() => doImportPack()}
+        onClick={() => openImportModal()}
         loading={isLoading}
       >
         Ouvrir
