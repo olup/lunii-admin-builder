@@ -5,7 +5,7 @@ import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { Header } from "./components/Header";
 import { MetadataCard } from "./components/MetadataCard";
 import { Option } from "./components/Option";
-import { state$ } from "./store";
+import { state$ } from "./store/store";
 import { cleanAllUnusedAssets } from "./utils/fs";
 
 function App() {

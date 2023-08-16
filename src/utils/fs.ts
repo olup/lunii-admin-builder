@@ -1,4 +1,4 @@
-import { OptionType, State } from "../store";
+import { OptionType, State } from "../store/store";
 import { genrate } from "./generate";
 import { getRandomFileName } from "./misc";
 import { zipAssets } from "./zip";
@@ -18,11 +18,15 @@ export const cleanAllUnusedAssets = async (initialOption: OptionType) => {
 
   // recursively get all file from the state
   const getFiles = (option: OptionType) => {
-    if (option.storyAudioRef) stateFiles.push(option.storyAudioRef);
-    if (option.titleImageRef) stateFiles.push(option.titleImageRef);
-    if (option.titleAudioRef) stateFiles.push(option.titleAudioRef);
-    if (option.options) {
-      option.options.forEach((option) => getFiles(option));
+    if (option.imageRef) stateFiles.push(option.imageRef);
+    if (option.audioRef) stateFiles.push(option.audioRef);
+
+    if (option.optionsType === "story") {
+      if (option.storyDetails.audioRef)
+        stateFiles.push(option.storyDetails.audioRef);
+    }
+    if (option.optionsType === "menu") {
+      option.menuDetails.options.forEach((option) => getFiles(option));
     }
   };
 
@@ -63,3 +67,72 @@ export const loadFile = async (file: File | null): Promise<string> => {
 
   return filePath;
 };
+
+export const copyAll = async (
+  source: FileSystemDirectoryHandle,
+  destination: FileSystemDirectoryHandle
+) => {
+  for await (const entry of source.values()) {
+    if (entry.kind === "file") {
+      const file = await entry.getFile();
+      const writable = await destination
+        .getFileHandle(entry.name, { create: true })
+        .then((file) => file.createWritable());
+      await writable.write(file);
+      await writable.close();
+    } else {
+      const dir = await destination.getDirectoryHandle(entry.name, {
+        create: true,
+      });
+      await copyAll(entry, dir);
+    }
+  }
+};
+
+export const writeFile = async (
+  root: FileSystemDirectoryHandle,
+  path: string,
+  content: Uint8Array | Blob | string,
+  createIfNotExists = false
+) => {
+  const fileHandle = await getFileHandleFromPath(root, path, createIfNotExists);
+  const writable = await fileHandle.createWritable();
+  await writable.write(content);
+  await writable.close();
+};
+
+export async function getFileHandleFromPath(
+  baseHandle: FileSystemDirectoryHandle,
+  filePath: string,
+  createIfNotExists = false
+) {
+  const parts = filePath.split("/").filter((part) => part !== ""); // Split the path into parts
+  const fileName = parts.pop();
+  if (!fileName) throw new Error(`Invalid file path: ${filePath}`);
+
+  let currentHandle = baseHandle;
+
+  for (const part of parts) {
+    try {
+      currentHandle = await currentHandle.getDirectoryHandle(part, {
+        create: createIfNotExists,
+      });
+    } catch (error) {
+      throw new Error(
+        `Error getting or creating directory handle for "${part}": ${
+          (error as Error).message
+        }`
+      );
+    }
+  }
+
+  try {
+    return currentHandle.getFileHandle(fileName, { create: createIfNotExists });
+  } catch (error) {
+    throw new Error(
+      `Error creating or writing to file "${filePath}": ${
+        (error as Error).message
+      }`
+    );
+  }
+}

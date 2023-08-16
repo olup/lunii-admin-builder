@@ -7,7 +7,7 @@ import {
   SegmentedControl,
 } from "@mantine/core";
 import { FC } from "react";
-import { OptionType } from "../store";
+import { OptionType } from "../store/store";
 import { AudioSelector, ImageSelector } from "./FileSelector";
 import { IconPlus } from "@tabler/icons-react";
 import { Arrow } from "./Arrow";
@@ -21,35 +21,44 @@ export const Option: FC<{
   parentId?: string;
 }> = ({ option, onUpdate, onRemove, id, parentId }) => {
   const handleAddOption = (type: "story" | "menu") => {
+    if (option.optionsType !== "menu") return;
     const newOption: OptionType = {
       uuid: crypto.randomUUID(),
-
-      optionsType: type,
-      titleImageRef: "",
-      titleAudioRef: "",
-      storyAudioRef: "",
-      options: [],
-
-      actionUuid: crypto.randomUUID(),
-      storyUuid: crypto.randomUUID(),
+      ...(type === "story"
+        ? {
+            optionsType: "story",
+            storyDetails: {
+              menuUuid: crypto.randomUUID(),
+              uuid: crypto.randomUUID(),
+            },
+          }
+        : {
+            optionsType: "menu",
+            menuDetails: {
+              uuid: crypto.randomUUID(),
+              options: [],
+            },
+          }),
     };
 
     const thisOption = deepCopy(option);
 
-    if (!thisOption.options) thisOption.options = [];
-    thisOption.options.push(newOption);
+    if (!thisOption.menuDetails.options) thisOption.menuDetails.options = [];
+    thisOption.menuDetails.options.push(newOption);
     onUpdate(thisOption);
   };
 
   const handleUpdateSubOption = (subOption: OptionType, i: number) => {
+    if (option.optionsType !== "menu") return;
     const thisOption = deepCopy(option);
-    thisOption.options![i] = subOption;
+    thisOption.menuDetails.options![i] = subOption;
     onUpdate(thisOption);
   };
 
   const handleRemoveSubOption = (i: number) => {
+    if (option.optionsType !== "menu") return;
     const thisOption = deepCopy(option);
-    thisOption.options!.splice(i, 1);
+    thisOption.menuDetails.options.splice(i, 1);
     onUpdate(thisOption);
   };
 
@@ -69,15 +78,15 @@ export const Option: FC<{
         )}
         <Paper shadow="sm" withBorder w={300} id={id} mr={20}>
           <ImageSelector
-            value={option.titleImageRef}
+            value={option.imageRef}
             onChange={async (file) => {
-              onUpdate({ ...option, titleImageRef: file || undefined });
+              onUpdate({ ...option, imageRef: file || undefined });
             }}
           />
           <AudioSelector
-            value={option.titleAudioRef}
+            value={option.audioRef}
             onChange={async (file) => {
-              onUpdate({ ...option, titleAudioRef: file || undefined });
+              onUpdate({ ...option, audioRef: file || undefined });
             }}
           />
 
@@ -89,9 +98,27 @@ export const Option: FC<{
                 { value: "story", label: "Lire une histoire" },
                 { value: "menu", label: "Afficher un menu" },
               ]}
-              onChange={(value) =>
-                onUpdate({ ...option, optionsType: value as "story" | "menu" })
-              }
+              onChange={(value) => {
+                if (value === "story") {
+                  onUpdate({
+                    ...option,
+                    optionsType: "story",
+                    storyDetails: {
+                      menuUuid: crypto.randomUUID(),
+                      uuid: crypto.randomUUID(),
+                    },
+                  });
+                } else {
+                  onUpdate({
+                    ...option,
+                    optionsType: "menu",
+                    menuDetails: {
+                      uuid: crypto.randomUUID(),
+                      options: [],
+                    },
+                  });
+                }
+              }}
             />
           </Center>
         </Paper>
@@ -113,7 +140,7 @@ export const Option: FC<{
         {option.optionsType === "menu" && (
           <Box>
             <Flex mt={100}>
-              {option.options?.map((option, i) => {
+              {option.menuDetails.options.map((option, i) => {
                 return (
                   <Box key={option.uuid}>
                     <Option
@@ -134,9 +161,15 @@ export const Option: FC<{
           <>
             <Paper shadow="sm" withBorder w={300} mt={100} id={`${id}-story`}>
               <AudioSelector
-                value={option.storyAudioRef}
+                value={option.storyDetails.audioRef}
                 onChange={async (file) => {
-                  onUpdate({ ...option, storyAudioRef: file || undefined });
+                  onUpdate({
+                    ...option,
+                    storyDetails: {
+                      ...option.storyDetails,
+                      audioRef: file || undefined,
+                    },
+                  });
                 }}
               />
             </Paper>

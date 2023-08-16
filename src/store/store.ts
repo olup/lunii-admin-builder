@@ -4,27 +4,44 @@ import {
   persistObservable,
 } from "@legendapp/state/persist";
 import { ObservablePersistLocalStorage } from "@legendapp/state/persist-plugins/local-storage";
-import { deepCopy } from "./utils/misc";
+import { deepCopy } from "../utils/misc";
+import { V1toV2 } from "./migrations";
 
-export type OptionType = {
+// define the state
+export type BaseOptionType = {
   uuid: string;
-  optionsType: "story" | "menu";
-  titleImageRef?: string;
-  titleAudioRef?: string;
-
-  storyUuid?: string;
-  storyAudioRef?: string;
-
-  actionUuid?: string;
-  options?: OptionType[];
+  imageRef?: string;
+  audioRef?: string;
+};
+export type MenuOptionType = BaseOptionType & {
+  optionsType: "menu";
+  menuDetails: {
+    uuid: string;
+    options: OptionType[];
+  };
 };
 
+export type StoryOptionType = BaseOptionType & {
+  optionsType: "story";
+  storyDetails: {
+    uuid: string;
+    menuUuid: string;
+    audioRef?: string;
+
+    // onFinishReading?: "stop" | "back" | "next"; // defaults to stop
+  };
+};
+
+export type OptionType = MenuOptionType | StoryOptionType;
+
 export type State = {
+  version: number;
   metadata: { title: string; author: string; description: string };
   initialOption: OptionType;
 };
 
 export const defaultState: State = {
+  version: 2,
   metadata: {
     title: "",
     author: "",
@@ -33,14 +50,12 @@ export const defaultState: State = {
   initialOption: {
     uuid: crypto.randomUUID(),
     optionsType: "menu",
-    titleImageRef: "",
-    titleAudioRef: "",
-    options: [],
-    actionUuid: crypto.randomUUID(),
-
-    // shouldn't be used as first node is always a menu
-    storyUuid: crypto.randomUUID(),
-    storyAudioRef: "",
+    imageRef: undefined,
+    audioRef: undefined,
+    menuDetails: {
+      uuid: crypto.randomUUID(),
+      options: [],
+    },
   },
 };
 export const state$ = observable<{
@@ -58,10 +73,16 @@ export const state$ = observable<{
 });
 export const resetState = () => state$.state.set(deepCopy(defaultState));
 
+// operate migrations
+V1toV2();
+
+// define persistence
 configureObservablePersistence({
   persistLocal: ObservablePersistLocalStorage,
 });
 
 persistObservable(state$.state, {
-  local: "state",
+  local: "stateV2",
 });
+
+export type Store = typeof state$;

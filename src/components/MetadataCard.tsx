@@ -1,6 +1,6 @@
 import { Paper, TextInput, Textarea } from "@mantine/core";
 import { FC } from "react";
-import { state$ } from "../store";
+import { state$ } from "../store/store";
 
 export const MetadataCard: FC = () => {
   const md = state$.state.metadata;

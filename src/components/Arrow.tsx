@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { state$ } from "../store";
+import { state$ } from "../store/store";
 
 const marginTop = 50;
 const radius = 30;

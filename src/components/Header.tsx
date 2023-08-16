@@ -8,8 +8,11 @@ import {
   IconUpload,
 } from "@tabler/icons-react";
 import { FC } from "react";
-import { resetState, state$ } from "../store";
+import { resetState, state$ } from "../store/store";
 import { exportPack } from "../utils/fs";
+import { importPack } from "../utils/import/importPack";
+import { useMutation } from "react-query";
+import { UnsuportedPackError } from "../utils/import/utils";
 
 export const Header: FC = () => {
   const openResetModal = () =>
@@ -26,6 +29,54 @@ export const Header: FC = () => {
       confirmProps: { color: "teal" },
       onCancel: () => {},
       onConfirm: () => resetState(),
+    });
+
+  const { mutate: doImportPack, isLoading } = useMutation(
+    async () => {
+      const file = await showOpenFilePicker({
+        types: [{ accept: { "application/zip": [".zip"] } }],
+      });
+      const state = await importPack(await file[0].getFile());
+      state$.state.assign(state);
+    },
+    {
+      onError: (e) => {
+        if (e instanceof UnsuportedPackError) {
+          return notifications.show({
+            color: "orange",
+            title: "Pack non supporté",
+            message:
+              "Pour le moment, seuls les packs créés avec lunii-admin-builder peuvent être ouverts",
+          });
+        }
+        notifications.show({
+          color: "red",
+          title: "Une erreur est survenue",
+          message: (e as Error).message,
+        });
+      },
+    }
+  );
+
+  const openImportModal = () =>
+    modals.openConfirmModal({
+      title: <Text>Ouvrir un Pack</Text>,
+      centered: true,
+      children: (
+        <>
+          <Text size="sm">
+            En ouvrant un nouveau pack, le travail non sauvegardé sera perdu.
+          </Text>
+          <Text size="sm">
+            Pour le moment Luniii Admin Builder ne peut ouvrir que les packs
+            qu'il a permis de créer.
+          </Text>
+        </>
+      ),
+      labels: { confirm: "Importer", cancel: "Annuler" },
+      confirmProps: { color: "teal" },
+      onCancel: () => {},
+      onConfirm: () => doImportPack(),
     });
 
   return (
@@ -46,7 +97,8 @@ export const Header: FC = () => {
         variant="outline"
         color="gray"
         rightIcon={<IconUpload size={18} />}
-        disabled
+        onClick={() => openImportModal()}
+        loading={isLoading}
       >
         Ouvrir
       </Button>
