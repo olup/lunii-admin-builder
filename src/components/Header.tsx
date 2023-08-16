@@ -60,7 +60,7 @@ export const Header: FC = () => {
 
   const openImportModal = () =>
     modals.openConfirmModal({
-      title: <Text>Ouvrir un Pack</Text>,
+      title: <Text>Importer un Pack</Text>,
       centered: true,
       children: (
         <>
