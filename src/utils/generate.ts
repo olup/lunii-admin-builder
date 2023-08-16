@@ -1,4 +1,4 @@
-import { OptionType, State } from "../store";
+import { OptionType, State } from "../store/store";
 import { StudioActionNode, StudioPack, StudioStageNode } from "../types";
 
 const menuControlSettings = {

@@ -8,9 +8,11 @@ import {
   IconUpload,
 } from "@tabler/icons-react";
 import { FC } from "react";
-import { resetState, state$ } from "../store";
+import { resetState, state$ } from "../store/store";
 import { exportPack } from "../utils/fs";
 import { importPack } from "../utils/import/importPack";
+import { useMutation } from "react-query";
+import { UnsuportedPackError } from "../utils/import/utils";
 
 export const Header: FC = () => {
   const openResetModal = () =>
@@ -28,6 +30,33 @@ export const Header: FC = () => {
       onCancel: () => {},
       onConfirm: () => resetState(),
     });
+
+  const { mutate: doImportPack, isLoading } = useMutation(
+    async () => {
+      const file = await showOpenFilePicker({
+        types: [{ accept: { "application/zip": [".zip"] } }],
+      });
+      const state = await importPack(await file[0].getFile());
+      state$.state.assign(state);
+    },
+    {
+      onError: (e) => {
+        if (e instanceof UnsuportedPackError) {
+          return notifications.show({
+            color: "orange",
+            title: "Pack non supporté",
+            message:
+              "Pour le moment, seuls les packs créés avec lunii-admin-builder peuvent être ouverts",
+          });
+        }
+        notifications.show({
+          color: "red",
+          title: "Une erreur est survenue",
+          message: (e as Error).message,
+        });
+      },
+    }
+  );
 
   return (
     <Box p={5} display="inline-flex" bg="white">
@@ -47,13 +76,8 @@ export const Header: FC = () => {
         variant="outline"
         color="gray"
         rightIcon={<IconUpload size={18} />}
-        onClick={async () => {
-          const file = await showOpenFilePicker({
-            types: [{ accept: { "application/zip": [".zip"] } }],
-          });
-          const state = await importPack(await file[0].getFile());
-          state$.state.assign(state);
-        }}
+        onClick={() => doImportPack()}
+        loading={isLoading}
       >
         Ouvrir
       </Button>

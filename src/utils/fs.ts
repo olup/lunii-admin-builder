@@ -1,4 +1,4 @@
-import { OptionType, State } from "../store";
+import { OptionType, State } from "../store/store";
 import { genrate } from "./generate";
 import { getRandomFileName } from "./misc";
 import { zipAssets } from "./zip";

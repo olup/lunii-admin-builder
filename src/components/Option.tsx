@@ -7,7 +7,7 @@ import {
   SegmentedControl,
 } from "@mantine/core";
 import { FC } from "react";
-import { OptionType } from "../store";
+import { OptionType } from "../store/store";
 import { AudioSelector, ImageSelector } from "./FileSelector";
 import { IconPlus } from "@tabler/icons-react";
 import { Arrow } from "./Arrow";

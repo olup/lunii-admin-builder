@@ -1,8 +1,9 @@
-import { State } from "../../store";
+import { State } from "../../store/store";
 import { StudioPack } from "../../types";
 import { copyAll } from "../fs";
 import { unzip } from "../zip";
 import { generateState } from "./generateState";
+import { UnsuportedPackError } from "./utils";
 
 export const importPack = async (file: File): Promise<State> => {
   // create a temporary directory
@@ -21,8 +22,8 @@ export const importPack = async (file: File): Promise<State> => {
     const packJson = await packFile.text();
     const pack: StudioPack = JSON.parse(packJson);
 
-    // controls that the pack has a tree structure
-    //controlTreeStructure(pack);
+    if (pack.source !== "LUNII_ADMIN_BUILDER")
+      throw new UnsuportedPackError("Invalid pack");
 
     // copy all assets to the assets directory
     const tmpAssetsDir = await tmpDir.getDirectoryHandle("assets");
