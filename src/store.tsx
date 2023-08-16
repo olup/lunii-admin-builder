@@ -6,25 +6,85 @@ import {
 import { ObservablePersistLocalStorage } from "@legendapp/state/persist-plugins/local-storage";
 import { deepCopy } from "./utils/misc";
 
-export type OptionType = {
-  uuid: string;
-  optionsType: "story" | "menu";
-  titleImageRef?: string;
-  titleAudioRef?: string;
+// initialize migrations
+const V1toV2 = () => {
+  const legacyJsonState = localStorage.getItem("state");
+  if (!legacyJsonState) return;
+  const legacyState = JSON.parse(legacyJsonState);
+  const treatOption = (option: any): OptionType => {
+    const base: BaseOptionType = {
+      uuid: option.uuid,
+      audioRef: option.titleAudioRef,
+      imageRef: option.titleImageRef,
+    };
 
-  storyUuid?: string;
-  storyAudioRef?: string;
+    if (option.optionsType === "menu") {
+      return {
+        ...base,
 
-  actionUuid?: string;
-  options?: OptionType[];
+        optionsType: "menu",
+        menuDetails: {
+          uuid: option.actionUuid,
+          options: option.menuDetails.options.map(treatOption),
+        },
+      };
+    } else {
+      return {
+        ...base,
+        optionsType: "story",
+        storyDetails: {
+          uuid: option.storyUuid,
+          menuUuid: option.actionUuid,
+          audioRef: option.storyAudioRef,
+        },
+      };
+    }
+  };
+  treatOption(legacyState.initialOption);
+
+  state$.state.set({
+    metadata: legacyState.metadata,
+    version: 2,
+    initialOption: treatOption(legacyState.initialOption),
+  });
+
+  localStorage.removeItem("state");
+
+  console.log("Migrated state from v1 to v2");
 };
 
+export type BaseOptionType = {
+  uuid: string;
+  imageRef?: string;
+  audioRef?: string;
+};
+export type MenuOptionType = BaseOptionType & {
+  optionsType: "menu";
+  menuDetails: {
+    uuid: string;
+    options: OptionType[];
+  };
+};
+
+export type StoryOptionType = BaseOptionType & {
+  optionsType: "story";
+  storyDetails: {
+    uuid: string;
+    menuUuid: string;
+    audioRef?: string;
+  };
+};
+
+export type OptionType = MenuOptionType | StoryOptionType;
+
 export type State = {
+  version: number;
   metadata: { title: string; author: string; description: string };
   initialOption: OptionType;
 };
 
 export const defaultState: State = {
+  version: 2,
   metadata: {
     title: "",
     author: "",
@@ -33,14 +93,12 @@ export const defaultState: State = {
   initialOption: {
     uuid: crypto.randomUUID(),
     optionsType: "menu",
-    titleImageRef: "",
-    titleAudioRef: "",
-    options: [],
-    actionUuid: crypto.randomUUID(),
-
-    // shouldn't be used as first node is always a menu
-    storyUuid: crypto.randomUUID(),
-    storyAudioRef: "",
+    imageRef: undefined,
+    audioRef: undefined,
+    menuDetails: {
+      uuid: crypto.randomUUID(),
+      options: [],
+    },
   },
 };
 export const state$ = observable<{
@@ -63,5 +121,8 @@ configureObservablePersistence({
 });
 
 persistObservable(state$.state, {
-  local: "state",
+  local: "stateV2",
 });
+
+// operate migrations
+V1toV2();

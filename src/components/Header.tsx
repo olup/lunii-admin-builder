@@ -10,6 +10,7 @@ import {
 import { FC } from "react";
 import { resetState, state$ } from "../store";
 import { exportPack } from "../utils/fs";
+import { importPack } from "../utils/import/importPack";
 
 export const Header: FC = () => {
   const openResetModal = () =>
@@ -46,7 +47,13 @@ export const Header: FC = () => {
         variant="outline"
         color="gray"
         rightIcon={<IconUpload size={18} />}
-        disabled
+        onClick={async () => {
+          const file = await showOpenFilePicker({
+            types: [{ accept: { "application/zip": [".zip"] } }],
+          });
+          const state = await importPack(await file[0].getFile());
+          state$.state.assign(state);
+        }}
       >
         Ouvrir
       </Button>

@@ -1,4 +1,5 @@
 import { OptionType, State } from "../store";
+import { StudioActionNode, StudioPack, StudioStageNode } from "../types";
 
 const menuControlSettings = {
   wheel: true,
@@ -66,21 +67,19 @@ export const genrate = (state: State) => {
   }
 
   const treatOption = (option: OptionType) => {
-    // control that the option has a title image and audio
-    if (!option.titleImageRef || !option.titleAudioRef) {
-      throw new Error("A menu must have a title image and audio");
-    }
-
     const backMenu = findBackMenuUuid(option.uuid);
 
     const stageNode = {
       uuid: option.uuid,
-      image: option.titleImageRef,
-      audio: option.titleAudioRef,
+      image: option.imageRef,
+      audio: option.audioRef,
       type: "stage",
       name: option.uuid,
       okTransition: {
-        actionNode: option.actionUuid,
+        actionNode:
+          option.optionsType === "menu"
+            ? option.menuDetails.uuid
+            : option.storyDetails.menuUuid,
         optionIndex: 0,
       },
       homeTransition: backMenu
@@ -96,20 +95,25 @@ export const genrate = (state: State) => {
 
     // if the node leads to a menu we register the coming menu
     if (option.optionsType === "menu") {
+      // control that it has an action uuid
+      if (!option.menuDetails.uuid)
+        throw new Error("A menu must have an action uuid");
+
       // control that it has sub nodes
-      if (option.options?.length === 0) {
+      if (option.menuDetails.options.length === 0) {
         throw new Error("A menu must have at least one sub node");
       }
 
-      const actionNode = {
-        id: option.actionUuid,
-        name: option.actionUuid,
-        options: option.options?.map((option) => option.uuid),
+      const actionNode: StudioActionNode = {
+        id: option.menuDetails.uuid,
+        uuid: option.menuDetails.uuid,
+        name: option.menuDetails.uuid,
+        options: option.menuDetails.options.map((option) => option.uuid),
       };
       actionNodes.push(actionNode);
 
       // treat sub nodes
-      option.options?.forEach((subOption) => {
+      option.menuDetails.options.forEach((subOption) => {
         treatOption(subOption);
       });
     }
@@ -117,27 +121,30 @@ export const genrate = (state: State) => {
     // if the node leads to a story we register the coming story with its
     // single item  menu
     if (option.optionsType === "story") {
-      if (!option.storyAudioRef) {
+      if (!option.storyDetails.audioRef || !option.storyDetails.uuid) {
+        console.log(option);
         throw new Error("A story must have an audio");
       }
 
       // register single item menu
       const menuNode = {
-        id: option.actionUuid,
-        options: [option.storyUuid],
+        id: option.storyDetails.menuUuid,
+        uuid: option.storyDetails.menuUuid,
+        name: option.storyDetails.menuUuid,
+        options: [option.storyDetails.uuid],
       };
       actionNodes.push(menuNode);
 
-      const backMenu = findBackMenuUuid(option.storyUuid!);
+      const backMenu = findBackMenuUuid(option.storyDetails.uuid);
 
       // register story node
-      const storyNode = {
-        uuid: option.storyUuid,
-        type: "stage",
-        image: null,
-        audio: option.storyAudioRef,
+      const storyNode: StudioStageNode = {
+        uuid: option.storyDetails.uuid,
+        type: "story",
+        image: undefined,
+        audio: option.storyDetails.audioRef,
         okTransition: null,
-        name: option.storyUuid,
+        name: option.storyDetails.uuid,
         homeTransition: backMenu
           ? {
               actionNode: backMenu[0],
@@ -155,7 +162,7 @@ export const genrate = (state: State) => {
   stageNodes[0].type = "cover";
   const packUuid = stageNodes[0].uuid;
 
-  const packObject = {
+  const packObject: StudioPack = {
     format: "v1",
     version: 2,
     uuid: packUuid,
