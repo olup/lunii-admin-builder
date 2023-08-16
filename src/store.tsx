@@ -11,6 +11,7 @@ const V1toV2 = () => {
   const legacyJsonState = localStorage.getItem("state");
   if (!legacyJsonState) return;
   const legacyState = JSON.parse(legacyJsonState);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const treatOption = (option: any): OptionType => {
     const base: BaseOptionType = {
       uuid: option.uuid,
@@ -25,7 +26,7 @@ const V1toV2 = () => {
         optionsType: "menu",
         menuDetails: {
           uuid: option.actionUuid,
-          options: option.menuDetails.options.map(treatOption),
+          options: option.options.map(treatOption),
         },
       };
     } else {
