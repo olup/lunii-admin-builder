@@ -136,3 +136,28 @@ export async function getFileHandleFromPath(
     );
   }
 }
+
+export const showFilePicker = async (accept?: FilePickerAcceptType[]) => {
+  if (window.showOpenFilePicker === undefined) {
+    // use traditionnal input method
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = accept?.map((type) => type.accept).join(",") || "";
+    input.click();
+    return new Promise<File | null>((resolve) => {
+      input.addEventListener("change", () => {
+        if (input.files && input.files.length > 0) {
+          resolve(input.files[0]);
+        } else {
+          resolve(null);
+        }
+      });
+    });
+  }
+
+  const [fileHandle] = await window.showOpenFilePicker({
+    types: accept,
+  });
+  const file = await fileHandle.getFile();
+  return file;
+};

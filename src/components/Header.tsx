@@ -9,7 +9,7 @@ import {
 } from "@tabler/icons-react";
 import { FC } from "react";
 import { resetState, state$ } from "../store/store";
-import { exportPack } from "../utils/fs";
+import { exportPack, showFilePicker } from "../utils/fs";
 import { importPack } from "../utils/import/importPack";
 import { useMutation } from "react-query";
 import { UnsuportedPackError } from "../utils/import/utils";
@@ -33,10 +33,11 @@ export const Header: FC = () => {
 
   const { mutate: doImportPack, isLoading } = useMutation(
     async () => {
-      const file = await showOpenFilePicker({
-        types: [{ accept: { "application/zip": [".zip"] } }],
-      });
-      const state = await importPack(await file[0].getFile());
+      const file = await showFilePicker([
+        { accept: { "application/zip": [".zip"] } },
+      ]);
+      if (!file) return;
+      const state = await importPack(file);
       state$.state.assign(state);
     },
     {
