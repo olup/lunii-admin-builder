@@ -1,5 +1,5 @@
-import { NodeType, State } from "../store/store";
-import { generate } from "./generate/generate";
+import { OptionType, State } from "../store/store";
+import { genrate } from "./generate";
 import { getRandomFileName } from "./misc";
 import { zipAssets } from "./zip";
 import { saveAs } from "file-saver";
@@ -11,21 +11,29 @@ export const getAssetDirectory = async () => {
   });
   return assets;
 };
-export const cleanAllUnusedAssets = async (
-  optionIndex: Record<string, NodeType>
-) => {
+export const cleanAllUnusedAssets = async (initialOption: OptionType) => {
+  const assets = await getAssetDirectory();
+
   const stateFiles: string[] = [];
-  const options = Object.values(optionIndex);
 
   // recursively get all file from the state
-  options.forEach((option: NodeType) => {
+  const getFiles = (option: OptionType) => {
     if (option.imageRef) stateFiles.push(option.imageRef);
     if (option.audioRef) stateFiles.push(option.audioRef);
-  });
 
-  // cleaning files
-  const assets = await getAssetDirectory();
+    if (option.optionsType === "story") {
+      if (option.storyDetails.audioRef)
+        stateFiles.push(option.storyDetails.audioRef);
+    }
+    if (option.optionsType === "menu") {
+      option.menuDetails.options.forEach((option) => getFiles(option));
+    }
+  };
+
+  getFiles(initialOption);
+
   const files = await assets.values();
+
   for await (const file of files) {
     if (!stateFiles.includes(file.name)) {
       await assets.removeEntry(file.name);
@@ -34,7 +42,7 @@ export const cleanAllUnusedAssets = async (
 };
 
 export const exportPack = async (state: State) => {
-  const packObject = generate(state);
+  const packObject = genrate(state);
   const blob = await zipAssets(packObject);
   const filename = state.metadata.title
     .replace(/[^a-z0-9]/gi, "_")

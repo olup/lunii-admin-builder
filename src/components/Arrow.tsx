@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { redrawArrow, state$ } from "../store/store";
+import { state$ } from "../store/store";
 
 const marginTop = 50;
 const radius = 30;
@@ -9,6 +9,8 @@ const strokeWidth = 2;
 const arrowColor = "#ccc";
 
 export const Arrow: FC<{ from: string; to: string }> = ({ from, to }) => {
+  const redraw = state$.ui.redrawArrow.use();
+
   const [sourcePosition, setSourcePosition] = useState({ x: 0, y: 0 });
   const [destinationPosition, setDestinationPosition] = useState({
     x: 0,
@@ -17,7 +19,7 @@ export const Arrow: FC<{ from: string; to: string }> = ({ from, to }) => {
 
   const [inited, setInited] = useState(false);
 
-  const draw = () => {
+  useEffect(() => {
     const scale = state$.ui.scale.peek();
 
     const frame = document.getElementById("arrrow-frame");
@@ -44,16 +46,7 @@ export const Arrow: FC<{ from: string; to: string }> = ({ from, to }) => {
     });
 
     setInited(true);
-  };
-
-  useEffect(() => {
-    draw();
-    const cancel = redrawArrow.on(() => {
-      setTimeout(() => draw(), 0);
-    });
-
-    return () => cancel();
-  }, [from, to]);
+  }, [from, to, redraw]);
 
   if (!inited) return null;
 
