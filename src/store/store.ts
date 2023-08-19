@@ -79,7 +79,7 @@ state$.state.nodeIndex.onChange((index) => {
 export const resetState = () => state$.state.set(deepCopy(defaultState));
 
 if (!localStorage.getItem("stateV4")) {
-  localStorage.setItem("stateV3", JSON.stringify(defaultState));
+  localStorage.setItem("stateV4", JSON.stringify(defaultState));
 }
 
 persistObservable(state$.state, {
@@ -89,7 +89,7 @@ persistObservable(state$.state, {
   },
 });
 
-if (!localStorage.getItem("state43")) {
+if (!localStorage.getItem("stateV4")) {
   resetState();
 }
 
