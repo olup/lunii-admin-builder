@@ -7,7 +7,7 @@ import { Option } from "./components/Option";
 import { state$ } from "./store/store";
 
 function App() {
-  const initialOptionUuid = state$.state.initialOptionUuid.use();
+  const initialOptionUuid = state$.state.initialNodeUuid.use();
 
   return (
     <>

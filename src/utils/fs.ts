@@ -1,4 +1,4 @@
-import { OptionType, State } from "../store/store";
+import { NodeType, State } from "../store/store";
 import { generate } from "./generate/generate";
 import { getRandomFileName } from "./misc";
 import { zipAssets } from "./zip";
@@ -12,13 +12,13 @@ export const getAssetDirectory = async () => {
   return assets;
 };
 export const cleanAllUnusedAssets = async (
-  optionIndex: Record<string, OptionType>
+  optionIndex: Record<string, NodeType>
 ) => {
   const stateFiles: string[] = [];
   const options = Object.values(optionIndex);
 
   // recursively get all file from the state
-  options.forEach((option: OptionType) => {
+  options.forEach((option: NodeType) => {
     if (option.imageRef) stateFiles.push(option.imageRef);
     if (option.audioRef) stateFiles.push(option.audioRef);
   });

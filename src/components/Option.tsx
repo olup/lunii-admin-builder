@@ -6,26 +6,29 @@ import {
   Paper,
   SegmentedControl,
   Select,
+  useMantineTheme,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { FC } from "react";
-import { OptionType, state$ } from "../store/store";
+import { NodeType, state$ } from "../store/store";
 import { Arrow } from "./Arrow";
 import { AudioSelector, ImageSelector } from "./FileSelector";
 
 export const Option: FC<{
   id: string;
 }> = ({ id }) => {
-  const optionIndex$ = state$.state.optionIndex;
+  const optionIndex$ = state$.state.nodeIndex;
   const optionIndex = optionIndex$.use();
-  const option$ = state$.state.optionIndex[id];
-  const option = state$.state.optionIndex[id].use();
+  const option$ = state$.state.nodeIndex[id];
+  const option = state$.state.nodeIndex[id].use();
 
   const parentId = option.parentOptionUuid;
   const parentOption = parentId ? optionIndex[parentId] : undefined;
 
+  const theme = useMantineTheme();
+
   const handleAddOption = () => {
-    const newOption: OptionType = {
+    const newOption: NodeType = {
       uuid: crypto.randomUUID(),
       type: "menu",
       parentOptionUuid: id,
@@ -45,7 +48,7 @@ export const Option: FC<{
   return (
     <>
       <Box>
-        {parentId && (
+        {parentId && option.type === "menu" && (
           <Button
             mb={5}
             size="xs"
@@ -65,7 +68,21 @@ export const Option: FC<{
             Supprimer
           </Button>
         )}
-        <Paper shadow="sm" withBorder w={300} id={id} mr={20} styles={{}}>
+        <Paper
+          shadow="sm"
+          withBorder
+          w={300}
+          id={id}
+          mr={20}
+          style={
+            option.type === "story"
+              ? {
+                  borderColor: theme.colors.blue[5],
+                  borderWidth: 2,
+                }
+              : {}
+          }
+        >
           {option.type === "menu" && (
             <ImageSelector
               value={option.imageRef}
@@ -101,6 +118,7 @@ export const Option: FC<{
                       uuid: storyUuid,
                       type: "story",
                       parentOptionUuid: id,
+                      onEnd: state$.ui.defaultEndAction.get(),
                     });
                   } else {
                     option$.menuDetails.to.set("menu");
@@ -111,10 +129,14 @@ export const Option: FC<{
             </Center>
           )}
           {option.type === "story" && (
-            <Box p={5}>
+            <Box p={10} pt={0}>
               <Select
                 label="Une fois la lecture terminée"
-                value={option.onEnd || "stop"}
+                value={option.onEnd}
+                onChange={(value: "stop" | "back" | "next") => {
+                  option$.onEnd.set(value);
+                  state$.ui.defaultEndAction.set(value);
+                }}
                 data={[
                   {
                     value: "stop",

@@ -10,8 +10,8 @@ export type PackMetadata = {
 export type StudioStageNode = {
   type: "stage" | "cover" | "story"; // is that used by studio ?
   uuid: string;
-  audio?: string;
-  image?: string;
+  audio?: string | null;
+  image?: string | null;
   name: string;
   okTransition: {
     actionNode: string;
@@ -28,6 +28,7 @@ export type StudioStageNode = {
     pause: boolean;
     autoplay: boolean;
   };
+  squareOne?: boolean;
 };
 
 export type StudioActionNode = {

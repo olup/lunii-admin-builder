@@ -1,7 +1,7 @@
-import { OptionType } from "../../store/store";
+import { NodeType } from "../../store/store";
 
 export const getBackMenu = (
-  oIndex: Record<string, OptionType>,
+  oIndex: Record<string, NodeType>,
   optionUuid: string
 ) => {
   const option = oIndex[optionUuid];
@@ -21,7 +21,7 @@ export const getBackMenu = (
 };
 
 export const getNextStory = (
-  oIndex: Record<string, OptionType>,
+  oIndex: Record<string, NodeType>,
   optionUuid: string
 ) => {
   const parentMenu = getBackMenu(oIndex, optionUuid);

@@ -31,10 +31,10 @@ export const generate = (state: State) => {
   const actionNodes: StudioActionNode[] = [];
 
   const treatOption = (optionUuid: string) => {
-    const option = state.optionIndex[optionUuid];
+    const option = state.nodeIndex[optionUuid];
     if (!option) throw new Error("Option not found");
 
-    const parentMenu = getBackMenu(state.optionIndex, optionUuid);
+    const parentMenu = getBackMenu(state.nodeIndex, optionUuid);
 
     const homeTransition = parentMenu
       ? {
@@ -62,7 +62,7 @@ export const generate = (state: State) => {
       }
 
       if (option.onEnd === "next") {
-        const nextStoryMenuUuid = getNextStory(state.optionIndex, optionUuid);
+        const nextStoryMenuUuid = getNextStory(state.nodeIndex, optionUuid);
         // then if we have a next story we go to it
         if (nextStoryMenuUuid) {
           okTransition = {
@@ -75,8 +75,8 @@ export const generate = (state: State) => {
 
     const stageNode = {
       uuid: option.uuid,
-      image: option.imageRef,
-      audio: option.audioRef,
+      image: option.imageRef || null,
+      audio: option.audioRef || null,
       type: "stage" as "stage" | "story" | "cover",
       name: option.uuid,
       okTransition,
@@ -113,9 +113,10 @@ export const generate = (state: State) => {
     }
   };
 
-  treatOption(state.initialOptionUuid);
+  treatOption(state.initialNodeUuid);
 
   stageNodes[0].type = "cover";
+  stageNodes[0].squareOne = true;
   const packUuid = stageNodes[0].uuid;
 
   const packObject: StudioPack = {

@@ -1,6 +1,6 @@
-import { OptionType } from "./store";
+import { NodeType } from "./store";
 
-export const cleanAllUnusedOption = (index: Record<string, OptionType>) => {
+export const cleanAllUnusedOption = (index: Record<string, NodeType>) => {
   const linkedOption = Object.values(index)
     .map((o) => {
       if (o.type === "menu") return o.menuDetails!.options;

@@ -1,17 +1,48 @@
-import { OptionType, State } from "../../store/store";
-import { StudioPack, StudioStageNode } from "../../types";
+import { NodeType, State } from "../../store/store";
+import { StudioPack } from "../../types";
+
+const getOptionType = (pack: StudioPack, stageNodeUuid: string) => {
+  const stageNode = pack.stageNodes.find(
+    (stageNode) => stageNode.uuid === stageNodeUuid
+  );
+  if (!stageNode) throw new Error("Wrong reference in options");
+  if (stageNode.okTransition) return "menu";
+  return "story";
+};
 
 const treatStageNode = (
+  optionIndex: Record<string, NodeType>,
   pack: StudioPack,
-  stageNode: StudioStageNode,
-  parentActionNodes: string[] = [],
-  depth: number = 0
-): OptionType | undefined => {
-  const okActionNode = stageNode.okTransition?.actionNode;
-  if (!okActionNode) return;
+  stageNodeUuid: string,
+  parentNodeUuid?: string
+): NodeType | undefined => {
+  const stageNode = pack.stageNodes.find(
+    (stageNode) => stageNode.uuid === stageNodeUuid
+  );
+  if (!stageNode) throw new Error("Wrong reference in options");
+
+  // here we only treat the case where story nodes end the branch
+  const type = getOptionType(pack, stageNodeUuid);
+
+  if (type === "story") {
+    // it's a story node
+    const option: NodeType = {
+      uuid: stageNode.uuid,
+      type,
+      audioRef: stageNode.audio || undefined,
+      imageRef: stageNode.image || undefined,
+      parentOptionUuid: parentNodeUuid,
+      onEnd: "stop",
+    };
+    optionIndex[option.uuid] = option;
+    return;
+  }
+
+  // it's a menu node
+  let to: "menu" | "story" = "menu";
 
   const actionNode = pack.actionNodes.find(
-    (actionNode) => actionNode.id === okActionNode
+    (actionNode) => actionNode.id === stageNode.okTransition!.actionNode
   );
 
   if (!actionNode) throw new Error("Wrong reference in okTransition");
@@ -22,73 +53,47 @@ const treatStageNode = (
       (stageNode) => stageNode.uuid === actionNode.options[0]
     );
     if (!childNode) throw new Error("Wrong reference in options");
+    const type = getOptionType(pack, childNode.uuid);
 
-    // first pattern is an end-of-the-line node
-    const pattern1 = !childNode.okTransition;
-    // second pattern is a node that goes back
-    const pattern2 =
-      childNode.okTransition &&
-      childNode.controlSettings.autoplay &&
-      parentActionNodes.includes(childNode.okTransition.actionNode);
-
-    if (pattern1 || pattern2) {
-      // it's a story node
-      return {
-        optionsType: "story",
-        uuid: stageNode.uuid,
-        audioRef: stageNode.audio,
-        imageRef: stageNode.image,
-
-        storyDetails: {
-          menuUuid: actionNode.uuid || actionNode.id,
-          uuid: childNode.uuid,
-          audioRef: childNode.audio,
-        },
-      };
-    }
+    if (type === "story") to = "story";
   }
 
-  // it's a menu node
-  return {
-    optionsType: "menu",
+  // register the menu node
+  const option: NodeType = {
+    type: "menu",
     uuid: stageNode.uuid,
-    audioRef: stageNode.audio,
-    imageRef: stageNode.image,
+    audioRef: stageNode.audio || undefined,
+    imageRef: stageNode.image || undefined,
+    onEnd: "stop",
+    parentOptionUuid: parentNodeUuid,
 
     menuDetails: {
       uuid: actionNode.uuid || actionNode.id,
-      options:
-        // we limit the depth to 10 to avoid infinite loops
-        depth < 10
-          ? actionNode.options.map((optionUuid) => {
-              const childNode = pack.stageNodes.find(
-                (stageNode) => stageNode.uuid === optionUuid
-              );
-              if (!childNode) throw new Error("Wrong reference in options");
-
-              const createdOption = treatStageNode(
-                pack,
-                childNode,
-                [...parentActionNodes, actionNode.id],
-                depth + 1
-              );
-              if (!createdOption) throw new Error("Wrong reference in options");
-              return createdOption;
-            })
-          : [],
+      options: actionNode.options,
+      to,
     },
   };
+
+  optionIndex[option.uuid] = option;
+
+  // treat sub nodes
+  actionNode.options.forEach((optionUuid) => {
+    treatStageNode(optionIndex, pack, optionUuid, option.uuid);
+  });
+  return;
 };
 
 export const generateState = (pack: StudioPack): State => {
   const stageNode = pack.stageNodes[0];
+  if (!stageNode) throw new Error("No stage node found");
 
-  const createdOption = treatStageNode(pack, stageNode);
-  if (!createdOption) throw new Error("Something is wrong with the pack");
-  console.log(createdOption);
+  const nodeIndex: Record<string, NodeType> = {};
+  treatStageNode(nodeIndex, pack, stageNode.uuid);
+
   return {
-    version: 2,
-    initialOption: createdOption,
+    version: 3,
+    initialNodeUuid: stageNode.uuid,
+    nodeIndex,
     metadata: {
       author: pack.author || "",
       title: pack.title,
