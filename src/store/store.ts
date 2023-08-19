@@ -24,7 +24,7 @@ export type NodeType = {
 };
 
 export type State = {
-  version: number;
+  version: 4;
   metadata: { title: string; author: string; description: string };
   initialNodeUuid: string;
   nodeIndex: Record<string, NodeType>;
@@ -78,18 +78,18 @@ state$.state.nodeIndex.onChange((index) => {
 
 export const resetState = () => state$.state.set(deepCopy(defaultState));
 
-if (!localStorage.getItem("stateV3")) {
+if (!localStorage.getItem("stateV4")) {
   localStorage.setItem("stateV3", JSON.stringify(defaultState));
 }
 
 persistObservable(state$.state, {
   persistLocal: ObservablePersistLocalStorage,
   local: {
-    name: "stateV3",
+    name: "stateV4",
   },
 });
 
-if (!localStorage.getItem("stateV3")) {
+if (!localStorage.getItem("state43")) {
   resetState();
 }
 

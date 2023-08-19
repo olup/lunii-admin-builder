@@ -104,7 +104,7 @@ export const generateState = (pack: StudioPack): State => {
   treatStageNode(nodeIndex, pack, stageNode.uuid);
 
   return {
-    version: 3,
+    version: 4,
     initialNodeUuid: stageNode.uuid,
     nodeIndex,
     metadata: {
