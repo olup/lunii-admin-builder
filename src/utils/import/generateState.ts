@@ -6,6 +6,12 @@ const getOptionType = (pack: StudioPack, stageNodeUuid: string) => {
     (stageNode) => stageNode.uuid === stageNodeUuid
   );
   if (!stageNode) throw new Error("Wrong reference in options");
+
+  // use type tags on the node
+  if (stageNode.type.includes("menu")) return "menu";
+  if (stageNode.type.includes("story")) return "story";
+
+  // crude detection - rarely accurate
   if (stageNode.okTransition) return "menu";
   return "story";
 };
@@ -21,10 +27,17 @@ const treatStageNode = (
   );
   if (!stageNode) throw new Error("Wrong reference in options");
 
-  // here we only treat the case where story nodes end the branch
   const type = getOptionType(pack, stageNodeUuid);
 
   if (type === "story") {
+    let onEnd: "stop" | "back" | "next" = "stop";
+    if (
+      stageNode.okTransition &&
+      stageNode.okTransition?.actionNode ===
+        stageNode.homeTransition?.actionNode
+    )
+      onEnd = "back";
+
     // it's a story node
     const option: NodeType = {
       uuid: stageNode.uuid,
@@ -32,7 +45,7 @@ const treatStageNode = (
       audioRef: stageNode.audio || undefined,
       imageRef: stageNode.image || undefined,
       parentOptionUuid: parentNodeUuid,
-      onEnd: "stop",
+      onEnd,
     };
     optionIndex[option.uuid] = option;
     return;
@@ -59,7 +72,7 @@ const treatStageNode = (
   }
 
   // register the menu node
-  const option: NodeType = {
+  const node: NodeType = {
     type: "menu",
     uuid: stageNode.uuid,
     audioRef: stageNode.audio || undefined,
@@ -74,11 +87,11 @@ const treatStageNode = (
     },
   };
 
-  optionIndex[option.uuid] = option;
+  optionIndex[node.uuid] = node;
 
   // treat sub nodes
   actionNode.options.forEach((optionUuid) => {
-    treatStageNode(optionIndex, pack, optionUuid, option.uuid);
+    treatStageNode(optionIndex, pack, optionUuid, node.uuid);
   });
   return;
 };

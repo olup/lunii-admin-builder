@@ -146,10 +146,10 @@ export const Option: FC<{
                     value: "back",
                     label: "Revenir au menu précédent",
                   },
-                  {
-                    value: "next",
-                    label: "Lire l'histoire suivante",
-                  },
+                  // {
+                  //   value: "next",
+                  //   label: "Lire l'histoire suivante",
+                  // },
                 ]}
               />
             </Box>

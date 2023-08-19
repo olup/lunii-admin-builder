@@ -8,7 +8,7 @@ export type PackMetadata = {
 };
 
 export type StudioStageNode = {
-  type: "stage" | "cover" | "story"; // is that used by studio ?
+  type: "stage" | "cover" | "story" | "menu"; // is that used by studio ?
   uuid: string;
   audio?: string | null;
   image?: string | null;

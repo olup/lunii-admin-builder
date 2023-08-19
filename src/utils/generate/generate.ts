@@ -77,7 +77,11 @@ export const generate = (state: State) => {
       uuid: option.uuid,
       image: option.imageRef || null,
       audio: option.audioRef || null,
-      type: "stage" as "stage" | "story" | "cover",
+      type: (option.type == "menu" ? "menu" : "story") as
+        | "stage"
+        | "story"
+        | "cover"
+        | "menu",
       name: option.uuid,
       okTransition,
       homeTransition,

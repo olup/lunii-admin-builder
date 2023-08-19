@@ -170,12 +170,12 @@ export const AudioSelector: FC<{
   }
 
   return (
-    <Box pos="relative">
+    <Box pos="relative" h={100}>
       <FileInput
         onChange={async (file) => await onChange(await loadFile(file))}
         accept="audio/mp3,audio/ogg,audio/wav"
       >
-        <Center h={100}>
+        <Center h="100%">
           <IconMusic size={40} />
         </Center>
       </FileInput>
