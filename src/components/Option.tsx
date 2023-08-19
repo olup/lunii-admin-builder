@@ -45,8 +45,6 @@ export const Option: FC<{
     optionIndex$[newOption.uuid].set(newOption);
   };
 
-  if (!option) return;
-
   return (
     <>
       <Box>
