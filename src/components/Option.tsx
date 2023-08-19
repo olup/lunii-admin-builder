@@ -5,130 +5,164 @@ import {
   Flex,
   Paper,
   SegmentedControl,
+  Select,
+  useMantineTheme,
 } from "@mantine/core";
-import { FC } from "react";
-import { OptionType } from "../store/store";
-import { AudioSelector, ImageSelector } from "./FileSelector";
 import { IconPlus } from "@tabler/icons-react";
+import { FC } from "react";
+import { NodeType, state$ } from "../store/store";
 import { Arrow } from "./Arrow";
-import { deepCopy } from "../utils/misc";
+import { AudioSelector, ImageSelector } from "./FileSelector";
 
 export const Option: FC<{
-  option: OptionType;
-  onUpdate: (option: OptionType) => void;
-  onRemove?: () => void;
   id: string;
-  parentId?: string;
-}> = ({ option, onUpdate, onRemove, id, parentId }) => {
-  const handleAddOption = (type: "story" | "menu") => {
-    if (option.optionsType !== "menu") return;
-    const newOption: OptionType = {
+}> = ({ id }) => {
+  const theme = useMantineTheme();
+
+  const optionIndex$ = state$.state.nodeIndex;
+  const optionIndex = optionIndex$.use();
+  const option$ = state$.state.nodeIndex[id];
+  const option = state$.state.nodeIndex[id].use();
+
+  if (!option) return null;
+
+  const parentId = option.parentOptionUuid;
+  const parentOption = parentId ? optionIndex[parentId] : undefined;
+
+  const handleAddOption = () => {
+    const newOption: NodeType = {
       uuid: crypto.randomUUID(),
-      ...(type === "story"
-        ? {
-            optionsType: "story",
-            storyDetails: {
-              menuUuid: crypto.randomUUID(),
-              uuid: crypto.randomUUID(),
-            },
-          }
-        : {
-            optionsType: "menu",
-            menuDetails: {
-              uuid: crypto.randomUUID(),
-              options: [],
-            },
-          }),
+      type: "menu",
+      parentOptionUuid: id,
+      menuDetails: {
+        to: "menu",
+        uuid: crypto.randomUUID(),
+        options: [],
+      },
     };
 
-    const thisOption = deepCopy(option);
-
-    if (!thisOption.menuDetails.options) thisOption.menuDetails.options = [];
-    thisOption.menuDetails.options.push(newOption);
-    onUpdate(thisOption);
-  };
-
-  const handleUpdateSubOption = (subOption: OptionType, i: number) => {
-    if (option.optionsType !== "menu") return;
-    const thisOption = deepCopy(option);
-    thisOption.menuDetails.options![i] = subOption;
-    onUpdate(thisOption);
-  };
-
-  const handleRemoveSubOption = (i: number) => {
-    if (option.optionsType !== "menu") return;
-    const thisOption = deepCopy(option);
-    thisOption.menuDetails.options.splice(i, 1);
-    onUpdate(thisOption);
+    option.menuDetails!.options.push(newOption.uuid);
+    optionIndex$[newOption.uuid].set(newOption);
   };
 
   return (
     <>
       <Box>
-        {onRemove && (
+        {parentId && option.type === "menu" && (
           <Button
             mb={5}
             size="xs"
             color="red"
             variant="light"
-            onClick={onRemove}
+            onClick={() => {
+              // delete from parent
+              const parentOptions = parentOption!.menuDetails!.options;
+              const updatedParentOptions = parentOptions.filter(
+                (o) => o !== id
+              );
+              optionIndex$[parentId].menuDetails.options.set(
+                updatedParentOptions
+              );
+            }}
           >
             Supprimer
           </Button>
         )}
-        <Paper shadow="sm" withBorder w={300} id={id} mr={20}>
-          <ImageSelector
-            value={option.imageRef}
-            onChange={async (file) => {
-              onUpdate({ ...option, imageRef: file || undefined });
-            }}
-          />
+        <Paper
+          shadow="sm"
+          withBorder
+          w={300}
+          id={id}
+          mr={20}
+          style={
+            option.type === "story"
+              ? {
+                  borderColor: theme.colors.blue[5],
+                  borderWidth: 2,
+                }
+              : {}
+          }
+        >
+          {option.type === "menu" && (
+            <ImageSelector
+              value={option.imageRef}
+              onChange={async (file) => {
+                option$.imageRef.set(file || undefined);
+              }}
+            />
+          )}
           <AudioSelector
             value={option.audioRef}
             onChange={async (file) => {
-              onUpdate({ ...option, audioRef: file || undefined });
+              option$.audioRef.set(file || undefined);
             }}
           />
 
-          <Center m={10}>
-            <SegmentedControl
-              fullWidth
-              value={option.optionsType}
-              data={[
-                { value: "story", label: "Lire une histoire" },
-                { value: "menu", label: "Afficher un menu" },
-              ]}
-              onChange={(value) => {
-                if (value === "story") {
-                  onUpdate({
-                    ...option,
-                    optionsType: "story",
-                    storyDetails: {
-                      menuUuid: crypto.randomUUID(),
-                      uuid: crypto.randomUUID(),
-                    },
-                  });
-                } else {
-                  onUpdate({
-                    ...option,
-                    optionsType: "menu",
-                    menuDetails: {
-                      uuid: crypto.randomUUID(),
-                      options: [],
-                    },
-                  });
-                }
-              }}
-            />
-          </Center>
+          {option.type === "menu" && (
+            <Center m={10}>
+              <SegmentedControl
+                fullWidth
+                value={option.menuDetails!.to}
+                data={[
+                  { value: "story", label: "Lire une histoire" },
+                  { value: "menu", label: "Afficher un menu" },
+                ]}
+                onChange={(value) => {
+                  if (option.type !== "menu") return;
+
+                  if (value === "story") {
+                    option$.menuDetails.to.set("story");
+                    const storyUuid = crypto.randomUUID();
+                    optionIndex$[id].menuDetails.options.set([storyUuid]);
+                    optionIndex$[storyUuid].set({
+                      uuid: storyUuid,
+                      type: "story",
+                      parentOptionUuid: id,
+                      onEnd: state$.ui.defaultEndAction.get(),
+                    });
+                  } else {
+                    option$.menuDetails.to.set("menu");
+                    optionIndex$[id].menuDetails.options.set([]);
+                  }
+                }}
+              />
+            </Center>
+          )}
+          {option.type === "story" && (
+            <Box p={10} pt={0}>
+              <Select
+                label="Une fois la lecture terminée"
+                value={option.onEnd}
+                onChange={(value: "stop" | "back" | "next") => {
+                  option$.onEnd.set(value);
+                  state$.ui.defaultEndAction.set(value);
+                }}
+                data={[
+                  {
+                    value: "stop",
+                    label: "Ne rien faire",
+                  },
+                  {
+                    value: "back",
+                    label: "Revenir au menu précédent",
+                  },
+                  // {
+                  //   value: "next",
+                  //   label: "Lire l'histoire suivante",
+                  // },
+                ]}
+              />
+            </Box>
+          )}
         </Paper>
-        {option.optionsType === "menu" && (
+
+        {option.type === "menu" && option.menuDetails!.to === "menu" && (
           <Center w={300} mt={10}>
             <Button
               variant="filled"
               sx={{ zIndex: 10 }}
               size="xs"
-              onClick={() => handleAddOption("menu")}
+              onClick={() => handleAddOption()}
               rightIcon={<IconPlus size={15} />}
               color="gray"
             >
@@ -137,44 +171,18 @@ export const Option: FC<{
           </Center>
         )}
 
-        {option.optionsType === "menu" && (
+        {option.type === "menu" && (
           <Box>
             <Flex mt={100}>
-              {option.menuDetails.options.map((option, i) => {
+              {option.menuDetails!.options.map((option) => {
                 return (
-                  <Box key={option.uuid}>
-                    <Option
-                      option={option}
-                      onUpdate={(option) => handleUpdateSubOption(option, i)}
-                      onRemove={() => handleRemoveSubOption(i)}
-                      id={`${id}-option-${option.uuid}`}
-                      parentId={id}
-                    />
+                  <Box key={option}>
+                    <Option id={option} />
                   </Box>
                 );
               })}
             </Flex>
           </Box>
-        )}
-
-        {option.optionsType === "story" && (
-          <>
-            <Paper shadow="sm" withBorder w={300} mt={100} id={`${id}-story`}>
-              <AudioSelector
-                value={option.storyDetails.audioRef}
-                onChange={async (file) => {
-                  onUpdate({
-                    ...option,
-                    storyDetails: {
-                      ...option.storyDetails,
-                      audioRef: file || undefined,
-                    },
-                  });
-                }}
-              />
-            </Paper>
-            <Arrow to={`${id}-story`} from={`${id}`} />
-          </>
         )}
       </Box>
 

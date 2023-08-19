@@ -1,19 +1,13 @@
 import { ActionIcon, Badge, Box, Flex, Space, Title } from "@mantine/core";
 import { IconBrandGithubFilled } from "@tabler/icons-react";
-import { useEffect } from "react";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { Header } from "./components/Header";
 import { MetadataCard } from "./components/MetadataCard";
 import { Option } from "./components/Option";
 import { state$ } from "./store/store";
-import { cleanAllUnusedAssets } from "./utils/fs";
 
 function App() {
-  const initialOption = state$.state.initialOption.use();
-
-  useEffect(() => {
-    state$.ui.redrawArrow.set(state$.ui.redrawArrow.peek() + 1);
-  }, [initialOption]);
+  const initialOptionUuid = state$.state.initialNodeUuid.use();
 
   return (
     <>
@@ -55,14 +49,7 @@ function App() {
               <Box mr={50}>
                 <MetadataCard />
               </Box>
-              <Option
-                option={initialOption}
-                id="option-main"
-                onUpdate={async (option) => {
-                  state$.state.initialOption.set(option);
-                  cleanAllUnusedAssets(option);
-                }}
-              />
+              <Option id={initialOptionUuid} />
             </Flex>
           </Box>
         </TransformComponent>

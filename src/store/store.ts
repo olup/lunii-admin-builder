@@ -1,88 +1,96 @@
-import { observable } from "@legendapp/state";
-import {
-  configureObservablePersistence,
-  persistObservable,
-} from "@legendapp/state/persist";
-import { ObservablePersistLocalStorage } from "@legendapp/state/persist-plugins/local-storage";
+import { event, observable } from "@legendapp/state";
+import { cleanAllUnusedAssets } from "../utils/fs";
 import { deepCopy } from "../utils/misc";
-import { V1toV2 } from "./migrations";
+import { persistObservable } from "@legendapp/state/persist";
+import { ObservablePersistLocalStorage } from "@legendapp/state/persist-plugins/local-storage";
+import { cleanAllUnusedNode } from "./utils";
 
 // define the state
-export type BaseOptionType = {
+export type NodeType = {
   uuid: string;
+  type: "menu" | "story"; // is this node a menu or a story
   imageRef?: string;
   audioRef?: string;
-};
-export type MenuOptionType = BaseOptionType & {
-  optionsType: "menu";
-  menuDetails: {
+
+  parentOptionUuid?: string;
+
+  menuDetails?: {
     uuid: string;
-    options: OptionType[];
+    options: string[];
+    to: "menu" | "story"; // where does this menu lead to
   };
+
+  onEnd?: "stop" | "back" | "next";
 };
-
-export type StoryOptionType = BaseOptionType & {
-  optionsType: "story";
-  storyDetails: {
-    uuid: string;
-    menuUuid: string;
-    audioRef?: string;
-
-    // onFinishReading?: "stop" | "back" | "next"; // defaults to stop
-  };
-};
-
-export type OptionType = MenuOptionType | StoryOptionType;
 
 export type State = {
-  version: number;
+  version: 4;
   metadata: { title: string; author: string; description: string };
-  initialOption: OptionType;
+  initialNodeUuid: string;
+  nodeIndex: Record<string, NodeType>;
 };
 
+const initalUUid = crypto.randomUUID();
+
 export const defaultState: State = {
-  version: 2,
+  version: 4,
   metadata: {
     title: "",
     author: "",
     description: "",
   },
-  initialOption: {
-    uuid: crypto.randomUUID(),
-    optionsType: "menu",
-    imageRef: undefined,
-    audioRef: undefined,
-    menuDetails: {
-      uuid: crypto.randomUUID(),
-      options: [],
+  nodeIndex: {
+    [initalUUid]: {
+      uuid: initalUUid,
+      type: "menu",
+      menuDetails: {
+        to: "menu",
+        uuid: crypto.randomUUID(),
+        options: [],
+      },
     },
   },
+  initialNodeUuid: initalUUid,
 };
 export const state$ = observable<{
   ui: {
     scale: number;
-    redrawArrow: number;
+    defaultEndAction: "stop" | "back" | "next";
   };
   state: State;
 }>({
   ui: {
     scale: 1,
-    redrawArrow: 0,
+    defaultEndAction: "stop",
   },
   state: deepCopy(defaultState),
 });
+
+export const redrawArrow = event();
+
+state$.state.nodeIndex.onChange((index) => {
+  console.log("index updated", index.value);
+  redrawArrow.fire();
+
+  cleanAllUnusedNode([state$.state.initialNodeUuid.peek()]);
+  cleanAllUnusedAssets(state$.state.nodeIndex.peek());
+});
+
 export const resetState = () => state$.state.set(deepCopy(defaultState));
 
-// operate migrations
-V1toV2();
-
-// define persistence
-configureObservablePersistence({
-  persistLocal: ObservablePersistLocalStorage,
-});
+if (!localStorage.getItem("stateV4")) {
+  localStorage.setItem("stateV3", JSON.stringify(defaultState));
+}
 
 persistObservable(state$.state, {
-  local: "stateV2",
+  persistLocal: ObservablePersistLocalStorage,
+  local: {
+    name: "stateV4",
+  },
 });
+
+if (!localStorage.getItem("state43")) {
+  resetState();
+}
 
 export type Store = typeof state$;

@@ -1,4 +1,4 @@
-import { Box, Button, Text } from "@mantine/core";
+import { Box, Button, Space, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import {
@@ -8,11 +8,10 @@ import {
   IconUpload,
 } from "@tabler/icons-react";
 import { FC } from "react";
+import { useMutation } from "react-query";
 import { resetState, state$ } from "../store/store";
 import { exportPack, showFilePicker } from "../utils/fs";
 import { importPack } from "../utils/import/importPack";
-import { useMutation } from "react-query";
-import { UnsuportedPackError } from "../utils/import/utils";
 
 export const Header: FC = () => {
   const openResetModal = () =>
@@ -42,14 +41,6 @@ export const Header: FC = () => {
     },
     {
       onError: (e) => {
-        if (e instanceof UnsuportedPackError) {
-          return notifications.show({
-            color: "orange",
-            title: "Pack non supporté",
-            message:
-              "Pour le moment, seuls les packs créés avec lunii-admin-builder peuvent être ouverts",
-          });
-        }
         notifications.show({
           color: "red",
           title: "Une erreur est survenue",
@@ -61,16 +52,17 @@ export const Header: FC = () => {
 
   const openImportModal = () =>
     modals.openConfirmModal({
-      title: <Text>Importer un Pack</Text>,
+      title: <Text>Importer un Pack (format STUdio)</Text>,
       centered: true,
       children: (
         <>
           <Text size="sm">
             En ouvrant un nouveau pack, le travail non sauvegardé sera perdu.
           </Text>
+          <Space h={10} />
           <Text size="sm">
-            Pour le moment Luniii Admin Builder ne peut ouvrir que les packs
-            qu'il a permis de créer.
+            L'ouverture de pack est une fonctionnalité expérimentale. Le
+            resultat ne sera peut être pas celui attendu.
           </Text>
         </>
       ),
@@ -101,7 +93,7 @@ export const Header: FC = () => {
         onClick={() => openImportModal()}
         loading={isLoading}
       >
-        Ouvrir
+        Importer
       </Button>
       <Button
         variant="outline"
