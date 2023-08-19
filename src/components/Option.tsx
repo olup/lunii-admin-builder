@@ -17,15 +17,17 @@ import { AudioSelector, ImageSelector } from "./FileSelector";
 export const Option: FC<{
   id: string;
 }> = ({ id }) => {
+  const theme = useMantineTheme();
+
   const optionIndex$ = state$.state.nodeIndex;
   const optionIndex = optionIndex$.use();
   const option$ = state$.state.nodeIndex[id];
   const option = state$.state.nodeIndex[id].use();
 
+  if (!option) return null;
+
   const parentId = option.parentOptionUuid;
   const parentOption = parentId ? optionIndex[parentId] : undefined;
-
-  const theme = useMantineTheme();
 
   const handleAddOption = () => {
     const newOption: NodeType = {
@@ -39,8 +41,8 @@ export const Option: FC<{
       },
     };
 
-    optionIndex$[newOption.uuid].set(newOption);
     option.menuDetails!.options.push(newOption.uuid);
+    optionIndex$[newOption.uuid].set(newOption);
   };
 
   if (!option) return;

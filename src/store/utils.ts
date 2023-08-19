@@ -1,6 +1,9 @@
-import { NodeType } from "./store";
+import { state$ } from "./store";
 
-export const cleanAllUnusedOption = (index: Record<string, NodeType>) => {
+export const cleanAllUnusedNode = (ignoredUuids?: string[]) => {
+  const index$ = state$.state.nodeIndex;
+  const index = index$.peek();
+
   const linkedOption = Object.values(index)
     .map((o) => {
       if (o.type === "menu") return o.menuDetails!.options;
@@ -8,10 +11,13 @@ export const cleanAllUnusedOption = (index: Record<string, NodeType>) => {
     })
     .flat();
 
+  linkedOption.push(...(ignoredUuids ?? []));
+
   const unusedOption = Object.keys(index).filter(
     (uuid) => !linkedOption.includes(uuid)
   );
-  unusedOption.forEach((uuid) => delete index[uuid]);
-  console.log(index);
-  return index;
+
+  unusedOption.forEach((uuid) => index$[uuid].delete());
+
+  if (unusedOption.length > 0) cleanAllUnusedNode(ignoredUuids);
 };

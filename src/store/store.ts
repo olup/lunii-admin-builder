@@ -3,6 +3,7 @@ import { cleanAllUnusedAssets } from "../utils/fs";
 import { deepCopy } from "../utils/misc";
 import { persistObservable } from "@legendapp/state/persist";
 import { ObservablePersistLocalStorage } from "@legendapp/state/persist-plugins/local-storage";
+import { cleanAllUnusedNode } from "./utils";
 
 // define the state
 export type NodeType = {
@@ -70,8 +71,9 @@ export const redrawArrow = event();
 state$.state.nodeIndex.onChange((index) => {
   console.log("index updated", index.value);
   redrawArrow.fire();
-  cleanAllUnusedAssets(index.value);
-  //todo clean unsused options
+
+  cleanAllUnusedNode([state$.state.initialNodeUuid.peek()]);
+  cleanAllUnusedAssets(state$.state.nodeIndex.peek());
 });
 
 export const resetState = () => state$.state.set(deepCopy(defaultState));
