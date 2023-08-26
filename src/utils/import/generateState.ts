@@ -11,9 +11,12 @@ const getOptionType = (pack: StudioPack, stageNodeUuid: string) => {
   if (stageNode.type.includes("menu")) return "menu";
   if (stageNode.type.includes("story")) return "story";
 
-  // crude detection - rarely accurate
-  if (stageNode.okTransition) return "menu";
-  return "story";
+  // crude detection - might not be accurate
+  if (stageNode.image) return "menu"; // but without an image might not be a story
+  if (stageNode.controlSettings.pause) return "story";
+  if (!stageNode.okTransition) return "story";
+
+  return "menu";
 };
 
 const treatStageNode = (
