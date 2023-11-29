@@ -15,7 +15,6 @@ export function LanguageSelector() {
 
   const matchI18nLanguage = getMatchI18nLanguage();
 
-  const [opened, setOpened] = useState(false);
   const [selected, setSelected] = useState(matchI18nLanguage ? matchI18nLanguage : data[0]);
 
   const items = data.map((item) => (
@@ -31,8 +30,6 @@ export function LanguageSelector() {
 
   return (
     <Menu
-      onOpen={() => setOpened(true)}
-      onClose={() => setOpened(false)}
       radius="md"
       withinPortal
       withArrow={true}
@@ -42,7 +39,6 @@ export function LanguageSelector() {
         <Button
           variant="outline"
           color="gray"
-          data-expanded={opened || undefined}
           rightIcon={<IconLanguage size={18} />}
         >
           <span>{selected.language}</span>
