@@ -9,6 +9,7 @@ import { useReactMediaRecorder } from "react-media-recorder";
 import { Player } from "./Player";
 import { FC, useEffect } from "react";
 import { modals } from "@mantine/modals";
+import { t } from "i18next";
 
 const actionIconProps = {
   variant: "filled",
@@ -89,10 +90,10 @@ export const Recorder: FC<{ onRecorded?: (url: string) => void }> = ({
 export const showRecorderModal = (onRecorded: (url: string) => void) => {
   let recording = "";
   modals.openConfirmModal({
-    title: "Enregistrement audio",
+    title: t("components.Recorder.modal.title"),
     children: <Recorder onRecorded={(url) => (recording = url)} />,
     size: "md",
-    labels: { confirm: "Utiliser l'enregistrement", cancel: "Annuler" },
+    labels: { confirm: t("components.Recorder.modal.labels.confirm"), cancel: t("components.Recorder.modal.labels.cancel") },
     confirmProps: { color: "teal" },
     onCancel: () => {},
     onConfirm: () => onRecorded(recording),

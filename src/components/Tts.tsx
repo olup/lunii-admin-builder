@@ -1,23 +1,18 @@
-import {
-  Alert,
-  Box,
-  Button,
-  Flex,
-  SegmentedControl,
-  Space,
-  TextInput,
-} from "@mantine/core";
-import { modals } from "@mantine/modals";
-import { FC, useEffect, useMemo, useState } from "react";
-import { useMutation } from "react-query";
-import { Player } from "./Player";
-import { IconAlertCircle, IconWand } from "@tabler/icons-react";
+import {Alert, Box, Button, Flex, SegmentedControl, Space, TextInput,} from "@mantine/core";
+import {modals} from "@mantine/modals";
+import {FC, useEffect, useMemo, useState} from "react";
+import {useMutation} from "react-query";
+import {Player} from "./Player";
+import {IconAlertCircle, IconWand} from "@tabler/icons-react";
+import {useTranslation} from "react-i18next";
+import {t} from "i18next";
 
 export const Tts: FC<{ onChange?: (audio: Blob | undefined) => void }> = ({
   onChange,
 }) => {
+  const { i18n, t } = useTranslation();
   const [text, setText] = useState("");
-  const [voice, setVoice] = useState("fr-FR-Wavenet-B");
+  const [voice, setVoice] = useState(`${i18n.language}-Wavenet-B`);
 
   const { mutate, data, isLoading, reset } = useMutation({
     mutationKey: "tts",
@@ -44,36 +39,38 @@ export const Tts: FC<{ onChange?: (audio: Blob | undefined) => void }> = ({
 
   return (
     <Box>
-      <Alert icon={<IconAlertCircle size="1rem" />} title="Note" color="grey">
-        Cette fonctionnalité dépends d'un service externe, il est possible que
-        le service soit disfonctionel.
+      <Alert icon={<IconAlertCircle size="1rem" />} title="Note" color="grey" translate={"yes"}>
+          {t('components.Tts.alert.text')}
       </Alert>
       <Space h={10} />
       <SegmentedControl
         value={voice}
         data={[
-          { value: "fr-FR-Wavenet-A", label: "Voix 1" },
-          { value: "fr-FR-Wavenet-B", label: "Voix 2" },
+          { value: `${i18n.language}-Wavenet-A`, label: t('components.Tts.voiceSelector.0') },
+          { value: `${i18n.language}-Wavenet-B`, label: t('components.Tts.voiceSelector.1') },
         ]}
         onChange={(voice) => {
           setVoice(voice);
           reset();
         }}
+        translate={"yes"}
       />
       <Space h={10} />
       <Flex>
         <TextInput
           wrapperProps={{ style: { flex: 1 } }}
-          placeholder="Texte"
+          placeholder={t('components.Tts.input.placeholder')}
           onChange={(e) => setText(e.currentTarget.value)}
+          translate={"yes"}
         />
         <Space w={10} />
         <Button
           onClick={() => mutate(text)}
           loading={isLoading}
           leftIcon={<IconWand size="16" />}
+          translate={"yes"}
         >
-          Générer
+            {t('components.Tts.button.text')}
         </Button>
       </Flex>
       <Space h={10} />
@@ -108,8 +105,9 @@ const TtsModal: FC<{ onValidate: (Audio: Blob) => void }> = ({
 };
 
 export const showTtsModal = (onValidate: (Audio: Blob) => void) => {
-  modals.open({
-    title: "Synthese Vocale",
+
+    modals.open({
+    title: t('components.Tts.modal.title'),
     children: (
       <TtsModal
         onValidate={(blob) => {

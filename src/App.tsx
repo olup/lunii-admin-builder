@@ -5,11 +5,14 @@ import { Header } from "./components/Header";
 import { MetadataCard } from "./components/MetadataCard";
 import { Option } from "./components/Option";
 import { state$ } from "./store/store";
+import { useTranslation } from "react-i18next";
 
 function App() {
   const initialOptionUuid = state$.state.initialNodeUuid.use();
+    const { t } = useTranslation();
 
-  return (
+
+    return (
     <>
       <TransformWrapper
         doubleClick={{ disabled: true }}
@@ -39,7 +42,7 @@ function App() {
         >
           <Box id="arrrow-frame" pos="relative">
             <Title size={70}>
-              Lunii Admin Builder
+              {t("common.appName")}
               <Badge color="lime">{__COMMIT_HASH__ || "xxxxx"} Alpha</Badge>
             </Title>
 

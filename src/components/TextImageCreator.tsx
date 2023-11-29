@@ -1,6 +1,8 @@
 import { Box, Button, Flex, Space, TextInput } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { FC, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { t } from "i18next";
 
 function wrapText(
   text: string,
@@ -65,6 +67,7 @@ const write = (ctx: CanvasRenderingContext2D, text: string) => {
 export const TextImageCreator: FC<{ onSave: (blob: Blob | null) => void }> = ({
   onSave,
 }) => {
+  const {t} = useTranslation();
   const [text, setText] = useState("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -82,7 +85,8 @@ export const TextImageCreator: FC<{ onSave: (blob: Blob | null) => void }> = ({
       <TextInput
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Votre texte (ou emojis 🚀)"
+        placeholder={t("components.TextImageCreator.TextInput.placeholder")}
+        translate={"yes"}
       />
       <Space h={10} />
       <canvas
@@ -99,8 +103,9 @@ export const TextImageCreator: FC<{ onSave: (blob: Blob | null) => void }> = ({
           onClick={() => {
             canvasRef.current?.toBlob(onSave);
           }}
+          translate={"yes"}
         >
-          Enregistrer
+          {t("components.TextImageCreator.button.save")}
         </Button>
       </Flex>
     </Box>
@@ -109,7 +114,7 @@ export const TextImageCreator: FC<{ onSave: (blob: Blob | null) => void }> = ({
 
 export const openTextImageCreator = (onSave: (blob: Blob | null) => void) => {
   modals.open({
-    title: "Créer une image avec du texte",
+    title: t("components.TextImageCreator.modal.title"),
     children: (
       <TextImageCreator
         onSave={(b) => {
