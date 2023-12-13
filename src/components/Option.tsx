@@ -13,10 +13,12 @@ import { FC } from "react";
 import { NodeType, state$ } from "../store/store";
 import { Arrow } from "./Arrow";
 import { AudioSelector, ImageSelector } from "./FileSelector";
+import { useTranslation } from "react-i18next";
 
 export const Option: FC<{
   id: string;
 }> = ({ id }) => {
+  const {t} = useTranslation();
   const theme = useMantineTheme();
 
   const optionIndex$ = state$.state.nodeIndex;
@@ -64,8 +66,9 @@ export const Option: FC<{
                 updatedParentOptions
               );
             }}
+            translate={"yes"}
           >
-            Supprimer
+            {t("components.Option.menu.remove")}
           </Button>
         )}
         <Paper
@@ -104,8 +107,8 @@ export const Option: FC<{
                 fullWidth
                 value={option.menuDetails!.to}
                 data={[
-                  { value: "story", label: "Lire une histoire" },
-                  { value: "menu", label: "Afficher un menu" },
+                  { value: "story", label: t("components.Option.menu.story") },
+                  { value: "menu", label: t("components.Option.menu.menu") },
                 ]}
                 onChange={(value) => {
                   if (option.type !== "menu") return;
@@ -125,13 +128,14 @@ export const Option: FC<{
                     optionIndex$[id].menuDetails.options.set([]);
                   }
                 }}
+                translate={"yes"}
               />
             </Center>
           )}
           {option.type === "story" && (
             <Box p={10} pt={0}>
               <Select
-                label="Une fois la lecture terminée"
+                label={t("components.Option.story.select.label")}
                 value={option.onEnd}
                 onChange={(value: "stop" | "back" | "next") => {
                   option$.onEnd.set(value);
@@ -140,17 +144,18 @@ export const Option: FC<{
                 data={[
                   {
                     value: "stop",
-                    label: "Ne rien faire",
+                    label: t("components.Option.story.select.options.stop"),
                   },
                   {
                     value: "back",
-                    label: "Revenir au menu précédent",
+                    label: t("components.Option.story.select.options.back"),
                   },
                   // {
                   //   value: "next",
-                  //   label: "Lire l'histoire suivante",
+                  //   label: t("components.Option.story.select.options.next"),
                   // },
                 ]}
+                translate={"yes"}
               />
             </Box>
           )}
@@ -165,8 +170,9 @@ export const Option: FC<{
               onClick={() => handleAddOption()}
               rightIcon={<IconPlus size={15} />}
               color="gray"
+              translate={"yes"}
             >
-              Ajouter un choix
+              {t("components.Option.menu.add")}
             </Button>
           </Center>
         )}

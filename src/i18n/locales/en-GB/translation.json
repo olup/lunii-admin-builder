@@ -1,0 +1,135 @@
+{
+  "common": {
+    "appName": "Lunii Admin Builder",
+    "error": {
+      "unknown": "An error occurred"
+    },
+    "import": "Import",
+    "cancel": "Cancel"
+  },
+  "newPack": {
+    "button": {
+      "text": "New"
+    },
+    "modal": {
+      "title": "New Pack",
+      "children": {
+        "text": "Are you sure you want to create a new pack? Any unsaved data will be lost."
+      },
+      "labels": {
+        "confirm": "Create a new pack",
+        "cancel": "Cancel"
+      }
+    }
+  },
+  "components": {
+    "FileSelector": {
+      "image": {
+        "menu": {
+          "clipboard": "Paste from clipboard",
+          "imageCreator": "Generate image from text"
+        },
+        "notifications": {
+          "noImageInClipboard": {
+            "title": "No image found in clipboard",
+            "message": ""
+          },
+          "failedToCopyFromClipboard": {
+            "title": "Failed to use from clipboard image"
+          }
+        }
+      },
+      "menu": {
+        "mic": "Use microphone",
+        "tts": "Use Text-To-Speech"
+      }
+    },
+    "Header": {
+      "import": {
+        "button": "Import",
+        "modal": {
+          "title": "Import a Pack (STUdio format)",
+          "children": {
+            "0": "When opening a new pack, unsaved work will be lost.",
+            "1": "Pack opening is an experimental feature.",
+            "2": "The result may not be as expected."
+          }
+        },
+        "labels": {
+          "confirm": "Import",
+          "cancel": "Cancel"
+        }
+      },
+      "build": {
+        "button": "Build & download"
+      },
+      "Install": {
+        "button": "Install on my Lunii"
+      }
+    },
+    "Tts": {
+      "modal": {
+        "title": "Text to Speech"
+      },
+      "alert": {
+        "text": "This feature depends on an external service, which may be unavailable at times."
+      },
+      "voiceSelector": {
+        "0": "Voice 1",
+        "1": "Voice 2"
+      },
+      "input": {
+        "placeholder": "Text"
+      },
+      "button": {
+        "text": "Generate"
+      }
+    },
+    "MetadataCard": {
+      "TextInputs": {
+        "title": "Pack title",
+        "author": "Author",
+        "description": "Description"
+      }
+    },
+    "Option": {
+      "menu": {
+        "story": "Play story",
+        "menu": "Show menu",
+        "add": "Add new choice",
+        "remove": "Remove"
+      },
+      "story": {
+        "select": {
+          "label": "Once playback is over",
+          "options": {
+            "stop": "Do nothing",
+            "back": "Go back to the previous menu",
+            "next": "Play next story"
+          }
+        }
+      }
+    },
+
+    "Recorder": {
+      "modal": {
+        "title": "Audio recording",
+        "labels": {
+          "confirm": "Use recording",
+          "cancel": "Cancel"
+        }
+      }
+    },
+    "TextImageCreator": {
+      "TextInput": {
+        "placeholder": "Type text (or emojis \uD83D\uDE80)"
+      },
+      "button": {
+        "save": "Save"
+      },
+      "modal": {
+        "title": "Generate image from text"
+      }
+    }
+  }
+}

@@ -12,28 +12,32 @@ import { useMutation } from "react-query";
 import { resetState, state$ } from "../store/store";
 import { exportPack, showFilePicker } from "../utils/fs";
 import { importPack } from "../utils/import/importPack";
+import { LanguageSelector } from "./LanguageSelector.tsx";
+import { Trans, useTranslation } from "react-i18next";
 
 export const Header: FC = () => {
+  const {t} = useTranslation();
+
   const openResetModal = () =>
     modals.openConfirmModal({
-      title: <Text>Nouveau Pack</Text>,
+      title: <Text translate={"yes"}>{t('newPack.modal.title')}</Text>,
       centered: true,
       children: (
-        <Text size="sm">
-          Êtes vous sûr de vouloir créer un nouveau pack ? Toutes les données
-          non sauvegardées seront perdues.
+        <Text size="sm" translate={"yes"}>
+          {t("newPack.modal.children.text")}
         </Text>
       ),
-      labels: { confirm: "Créer un nouveau pack", cancel: "Annuler" },
-      confirmProps: { color: "teal" },
-      onCancel: () => {},
+      labels: {confirm: t("newPack.modal.labels.confirm"), cancel: t("newPack.modal.labels.cancel")},
+      confirmProps: {color: "teal"},
+      onCancel: () => {
+      },
       onConfirm: () => resetState(),
     });
 
-  const { mutate: doImportPack, isLoading } = useMutation(
+  const {mutate: doImportPack, isLoading} = useMutation(
     async () => {
       const file = await showFilePicker([
-        { accept: { "application/zip": [".zip"] } },
+        {accept: {"application/zip": [".zip"]}},
       ]);
       if (!file) return;
       const state = await importPack(file);
@@ -43,7 +47,7 @@ export const Header: FC = () => {
       onError: (e) => {
         notifications.show({
           color: "red",
-          title: "Une erreur est survenue",
+          title: t("common.error.unknown"),
           message: (e as Error).message,
         });
       },
@@ -52,23 +56,29 @@ export const Header: FC = () => {
 
   const openImportModal = () =>
     modals.openConfirmModal({
-      title: <Text>Importer un Pack (format STUdio)</Text>,
+      title: <Text translate={"yes"}><Trans key={"components.Header.import.modal.title"}></Trans></Text>,
       centered: true,
       children: (
         <>
-          <Text size="sm">
-            En ouvrant un nouveau pack, le travail non sauvegardé sera perdu.
+          <Text size="sm" translate={"yes"}>
+            {t("components.Header.import.modal.children.0")}
           </Text>
-          <Space h={10} />
-          <Text size="sm">
-            L'ouverture de pack est une fonctionnalité expérimentale. Le
-            resultat ne sera peut être pas celui attendu.
+          <Space h={10}/>
+          <Text size="sm" translate={"yes"}>
+            {t("components.Header.import.modal.children.1")}
+          </Text>
+          <Text size="sm" translate={"yes"}>
+            {t("components.Header.import.modal.children.2")}
           </Text>
         </>
       ),
-      labels: { confirm: "Importer", cancel: "Annuler" },
-      confirmProps: { color: "teal" },
-      onCancel: () => {},
+      labels: {
+        confirm: t("components.Header.import.labels.confirm"),
+        cancel: t("components.Header.import.labels.cancel")
+      },
+      confirmProps: {color: "teal"},
+      onCancel: () => {
+      },
       onConfirm: () => doImportPack(),
     });
 
@@ -78,42 +88,47 @@ export const Header: FC = () => {
         mr={5}
         variant="outline"
         color="gray"
-        rightIcon={<IconPlus size={18} />}
+        rightIcon={<IconPlus size={18}/>}
         onClick={() => {
           openResetModal();
         }}
+        translate={"yes"}
       >
-        Nouveau
+        {t('newPack.button.text')}
       </Button>
       <Button
         mr={5}
         variant="outline"
         color="gray"
-        rightIcon={<IconUpload size={18} />}
+        rightIcon={<IconUpload size={18}/>}
         onClick={() => openImportModal()}
         loading={isLoading}
+        translate={"yes"}
       >
-        Importer
+        {t('components.Header.import.button')}
       </Button>
       <Button
+        mr={5}
         variant="outline"
         color="gray"
-        rightIcon={<IconDownload size={18} />}
+        rightIcon={<IconDownload size={18}/>}
         onClick={async () => {
           try {
             await exportPack(state$.state.peek());
           } catch (e) {
             console.error(e);
             notifications.show({
-              title: "Une erreur est survenue",
+              title: t("common.error.unknown"),
               message: (e as Error).message,
               color: "red",
             });
           }
         }}
+        translate={"yes"}
       >
-        Générer & télécharger
+        {t('components.Header.build.button')}
       </Button>
+      <LanguageSelector/>
       <Button
         variant="white"
         color="gray"
@@ -121,8 +136,9 @@ export const Header: FC = () => {
         component="a"
         href="https://lunii-admin-web.pages.dev"
         target="_blank"
+        translate={"yes"}
       >
-        Installer sur ma Lunii
+        {t('components.Header.Install.button')}
       </Button>
     </Box>
   );

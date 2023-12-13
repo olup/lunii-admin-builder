@@ -1,0 +1,17 @@
+[
+  {
+    "language": "Français",
+    "variant": "Français (France)",
+    "locale": "fr-FR"
+  },
+  {
+    "language": "English",
+    "variant": "English (British)",
+    "locale": "en-GB"
+  },
+  {
+    "language": "English",
+    "variant": "English (US)",
+    "locale": "en-US"
+  }
+]

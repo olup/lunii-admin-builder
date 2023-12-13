@@ -19,6 +19,7 @@ import { Player } from "./Player";
 import { showRecorderModal } from "./Recorder";
 import { showTtsModal } from "./Tts";
 import { openTextImageCreator } from "./TextImageCreator";
+import { useTranslation } from "react-i18next";
 
 const getFileUrlValue = async (fileName: string) => {
   const assets = await getAssetDirectory();
@@ -40,6 +41,7 @@ export const ImageSelector: FC<{
   value?: string;
   onChange: (value: string | null) => void;
 }> = ({ value, onChange }) => {
+  const {t} = useTranslation();
   const url = useGetFileUrlValue(value);
 
   const loadFromImageCreator = async () =>
@@ -54,8 +56,8 @@ export const ImageSelector: FC<{
       const imageBlob = await getImageFromClipboard();
       if (!imageBlob) {
         notifications.show({
-          title: "Le clipboard ne contient pas d'image",
-          message: "",
+          title: t("components.FileSelector.image.notifications.noImageInClipboard.title"),
+          message: t("components.FileSelector.image.notifications.noImageInClipboard.message"),
           color: "yellow",
         });
         return;
@@ -65,7 +67,7 @@ export const ImageSelector: FC<{
     } catch (e) {
       console.error(e);
       notifications.show({
-        title: "Impossible de copier depuis le clipboard",
+        title: t("components.FileSelector.image.notifications.failedToCopyFromClipboard.title"),
         message: (e as Error).message,
         color: "red",
       });
@@ -124,14 +126,16 @@ export const ImageSelector: FC<{
             <Menu.Item
               icon={<IconClipboard size={14} />}
               onClick={loadFromClipboard}
+              translate={"yes"}
             >
-              Coller epuis le clipboard
+              {t("components.FileSelector.image.menu.clipboard")}
             </Menu.Item>
             <Menu.Item
               icon={<IconAlphabetLatin size={14} />}
               onClick={loadFromImageCreator}
+              translate={"yes"}
             >
-              Depuis du texte (créateur d'image)
+              {t("components.FileSelector.image.menu.imageCreator")}
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>
@@ -144,6 +148,7 @@ export const AudioSelector: FC<{
   value?: string;
   onChange: (value: string | null) => void;
 }> = ({ value, onChange }) => {
+  const {t} = useTranslation();
   const url = useGetFileUrlValue(value);
 
   if (value) {
@@ -197,8 +202,9 @@ export const AudioSelector: FC<{
                   await onChange(file);
                 })
               }
+              translate={"yes"}
             >
-              Depuis le micro
+              {t('components.FileSelector.menu.mic')}
             </Menu.Item>
             <Menu.Item
               icon={<IconExternalLink size={14} />}
@@ -208,8 +214,9 @@ export const AudioSelector: FC<{
                   await onChange(file);
                 })
               }
+              translate={"yes"}
             >
-              Depuis du texte (synthèse)
+              {t('components.FileSelector.menu.tts')}
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>

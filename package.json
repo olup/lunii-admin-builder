@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "toc": "i18next-resources-for-ts toc -i src/i18n/locales/en-GB -o ./src/@types/resources.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -20,10 +21,13 @@
     "@tabler/icons-react": "^2.30.0",
     "@types/file-saver": "^2.0.5",
     "file-saver": "^2.0.5",
+    "i18next": "^23.7.7",
+    "i18next-browser-languagedetector": "^7.2.0",
     "jszip": "^3.10.1",
     "nanoid": "^4.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-i18next": "^13.5.0",
     "react-media-recorder": "^1.6.6",
     "react-query": "^3.39.3",
     "react-zoom-pan-pinch": "^3.1.0",
@@ -40,6 +44,7 @@
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
+    "i18next-resources-for-ts": "^1.4.0",
     "typescript": "^5.0.2",
     "vite": "^4.4.5"
   }
