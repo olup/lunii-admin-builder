@@ -4,7 +4,6 @@ import {
   IconAlphabetLatin,
   IconClipboard,
   IconDots,
-  IconExternalLink,
   IconMicrophone,
   IconMusic,
   IconPhoto,
@@ -17,7 +16,6 @@ import { getImageFromClipboard } from "../utils/misc";
 import { FileInput } from "./FileInput";
 import { Player } from "./Player";
 import { showRecorderModal } from "./Recorder";
-import { showTtsModal } from "./Tts";
 import { openTextImageCreator } from "./TextImageCreator";
 import { useTranslation } from "react-i18next";
 
@@ -205,18 +203,6 @@ export const AudioSelector: FC<{
               translate={"yes"}
             >
               {t('components.FileSelector.menu.mic')}
-            </Menu.Item>
-            <Menu.Item
-              icon={<IconExternalLink size={14} />}
-              onClick={() =>
-                showTtsModal(async (blob) => {
-                  const file = await loadFile(new File([blob], "x.mp3"));
-                  await onChange(file);
-                })
-              }
-              translate={"yes"}
-            >
-              {t('components.FileSelector.menu.tts')}
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>

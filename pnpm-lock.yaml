@@ -65,9 +65,6 @@ dependencies:
   react-zoom-pan-pinch:
     specifier: ^3.1.0
     version: 3.1.0(react-dom@18.2.0)(react@18.2.0)
-  speech-synthesis-recorder:
-    specifier: ^1.2.1
-    version: 1.2.1
 
 devDependencies:
   '@types/node':
@@ -2495,10 +2492,6 @@ packages:
   /source-map@0.5.7:
     resolution: {integrity: sha512-LbrmJOMUSdEVxIKvdcJzQC+nQhe8FUZQTXQy6+I75skNgn3OoQ0DZA8YnFa7gp8tqtL3KPf1kmo0R5DoApeSGQ==}
     engines: {node: '>=0.10.0'}
-    dev: false
-
-  /speech-synthesis-recorder@1.2.1:
-    resolution: {integrity: sha512-Ttf7XRvPEpDu/M1cdRLyFrzF83b+keZJx//8Xu0ikONfp0RTHGWRhd4bNrQ5b+qbxIoJFB3I2qs9fFHs5T+eMA==}
     dev: false
 
   /standardized-audio-context@25.3.55:

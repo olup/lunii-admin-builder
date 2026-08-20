@@ -40,8 +40,7 @@
         }
       },
       "menu": {
-        "mic": "Use microphone",
-        "tts": "Use Text-To-Speech"
+        "mic": "Use microphone"
       }
     },
     "Header": {
@@ -65,24 +64,6 @@
       },
       "Install": {
         "button": "Install on my Lunii"
-      }
-    },
-    "Tts": {
-      "modal": {
-        "title": "Text to Speech"
-      },
-      "alert": {
-        "text": "This feature depends on an external service, which may be unavailable at times."
-      },
-      "voiceSelector": {
-        "0": "Voice 1",
-        "1": "Voice 2"
-      },
-      "input": {
-        "placeholder": "Text"
-      },
-      "button": {
-        "text": "Generate"
       }
     },
     "MetadataCard": {
