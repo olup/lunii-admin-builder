@@ -1,5 +1,5 @@
 import { Paper, TextInput, Textarea } from "@mantine/core";
-import { FC } from "react";
+import type { FC } from "react";
 import { state$ } from "../store/store";
 import { useTranslation } from "react-i18next";
 

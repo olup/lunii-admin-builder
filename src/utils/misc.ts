@@ -17,9 +17,9 @@ export const deepCopy = <T>(obj: T): T => {
   const copyObj = {};
   for (const key in obj) {
     // eslint-disable-next-line
-    if (obj.hasOwnProperty(key)) {
+    if (Object.hasOwn(obj, key)) {
       // eslint-disable-next-line
-      // @ts-ignore
+      // @ts-expect-error
       copyObj[key] = deepCopy(obj[key]);
     }
   }

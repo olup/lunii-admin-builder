@@ -1,5 +1,5 @@
 import { Box } from "@mantine/core";
-import React, { ChangeEvent, FC, ReactNode } from "react";
+import React, { type ChangeEvent, type FC, type ReactNode } from "react";
 
 export const FileInput: FC<{
   accept?: string;
@@ -20,16 +20,13 @@ export const FileInput: FC<{
 
   return (
     <>
-      <Box onClick={handleClick} sx={{ cursor: "pointer" }} p={10} h="100%">
+      <Box onClick={handleClick} style={{ cursor: "pointer" }} p={10} h="100%">
         <Box
           h="100%"
-          sx={{
+          style={{
             border: "1px dashed",
             borderColor: "#ccc",
             borderRadius: 5,
-            "&:hover": {
-              borderColor: "#000",
-            },
           }}
         >
           {children}

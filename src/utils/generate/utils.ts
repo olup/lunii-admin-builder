@@ -1,4 +1,4 @@
-import { NodeType } from "../../store/store";
+import type { NodeType } from "../../store/store";
 
 export const getBackMenu = (
   oIndex: Record<string, NodeType>,
@@ -14,9 +14,7 @@ export const getBackMenu = (
   const grandparent = oIndex[parent.parentOptionUuid];
   if (!grandparent) throw new Error("Grandparent not found");
   const uuid = grandparent.menuDetails!.uuid;
-  const index = grandparent.menuDetails!.options.findIndex(
-    (uuid) => uuid === parent.uuid
-  );
+  const index = grandparent.menuDetails!.options.indexOf(parent.uuid);
   return { uuid, index };
 };
 

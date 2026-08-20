@@ -1,6 +1,6 @@
 import { Box, Button, Flex, Space, TextInput } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { FC, useEffect, useRef, useState } from "react";
+import { type FC, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { t } from "i18next";
 
@@ -14,7 +14,7 @@ function wrapText(
   let currentLine = words[0];
 
   for (let i = 1; i < words.length; i++) {
-    const testLine = currentLine + " " + words[i];
+    const testLine = `${currentLine} ${words[i]}`;
     const metrics = context.measureText(testLine);
     const lineWidth = metrics.width;
 
@@ -78,7 +78,7 @@ export const TextImageCreator: FC<{ onSave: (blob: Blob | null) => void }> = ({
     if (!ctx) return;
 
     write(ctx, text);
-  }, [text, canvasRef]);
+  }, [text]);
 
   return (
     <Box>

@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import { execSync } from "child_process";
+import { execSync } from "node:child_process";
 
 const commitHash = execSync("git rev-parse --short HEAD").toString();
 

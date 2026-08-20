@@ -1,4 +1,4 @@
-import { NodeType, State } from "../store/store";
+import type { NodeType, State } from "../store/store";
 import { generate } from "./generate/generate";
 import { getRandomFileName } from "./misc";
 import { zipAssets } from "./zip";
@@ -39,7 +39,7 @@ export const exportPack = async (state: State) => {
   const filename = state.metadata.title
     .replace(/[^a-z0-9]/gi, "_")
     .toLowerCase();
-  saveAs(blob, filename + ".zip");
+  saveAs(blob, `${filename}.zip`);
 };
 
 export const loadFile = async (file: File | null): Promise<string> => {
@@ -89,7 +89,9 @@ export const writeFile = async (
 ) => {
   const fileHandle = await getFileHandleFromPath(root, path, createIfNotExists);
   const writable = await fileHandle.createWritable();
-  await writable.write(content);
+  await writable.write(
+    content instanceof Uint8Array ? Uint8Array.from(content) : content
+  );
   await writable.close();
 };
 
@@ -113,7 +115,8 @@ export async function getFileHandleFromPath(
       throw new Error(
         `Error getting or creating directory handle for "${part}": ${
           (error as Error).message
-        }`
+        }`,
+        { cause: error }
       );
     }
   }
@@ -124,7 +127,8 @@ export async function getFileHandleFromPath(
     throw new Error(
       `Error creating or writing to file "${filePath}": ${
         (error as Error).message
-      }`
+      }`,
+      { cause: error }
     );
   }
 }

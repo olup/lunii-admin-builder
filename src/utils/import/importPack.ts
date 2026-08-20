@@ -1,5 +1,5 @@
-import { State } from "../../store/store";
-import { StudioPack } from "../../types";
+import type { State } from "../../store/store";
+import type { StudioPack } from "../../types";
 import { copyAll } from "../fs";
 import { unzip } from "../zip";
 import { generateState } from "./generateState";

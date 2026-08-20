@@ -7,7 +7,7 @@ import {
 } from "@tabler/icons-react";
 import { useReactMediaRecorder } from "react-media-recorder";
 import { Player } from "./Player";
-import { FC, useEffect } from "react";
+import { type FC, useEffect } from "react";
 import { modals } from "@mantine/modals";
 import { t } from "i18next";
 

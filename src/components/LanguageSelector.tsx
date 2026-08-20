@@ -39,7 +39,7 @@ export function LanguageSelector() {
         <Button
           variant="outline"
           color="gray"
-          rightIcon={<IconLanguage size={18} />}
+          rightSection={<IconLanguage size={18} />}
         >
           <span>{selected.language}</span>
         </Button>

@@ -1,5 +1,5 @@
-import { State } from "../../store/store";
-import { StudioActionNode, StudioPack, StudioStageNode } from "../../types";
+import type { State } from "../../store/store";
+import type { StudioActionNode, StudioPack, StudioStageNode } from "../../types";
 import { getBackMenu, getNextStory } from "./utils";
 
 const menuControlSettings = {
@@ -77,7 +77,7 @@ export const generate = (state: State) => {
       uuid: option.uuid,
       image: option.imageRef || null,
       audio: option.audioRef || null,
-      type: (option.type == "menu" ? "menu" : "story") as
+      type: (option.type === "menu" ? "menu" : "story") as
         | "stage"
         | "story"
         | "cover"

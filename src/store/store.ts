@@ -83,7 +83,7 @@ if (!localStorage.getItem("stateV4")) {
 }
 
 persistObservable(state$.state, {
-  persistLocal: ObservablePersistLocalStorage,
+  pluginLocal: ObservablePersistLocalStorage,
   local: {
     name: "stateV4",
   },

@@ -9,7 +9,7 @@ import {
   IconPhoto,
   IconX,
 } from "@tabler/icons-react";
-import { FC, useEffect, useState } from "react";
+import { type FC, useEffect, useState } from "react";
 import { getAssetDirectory, loadFile } from "../utils/fs";
 import { resizeImage } from "../utils/image";
 import { getImageFromClipboard } from "../utils/misc";
@@ -27,12 +27,32 @@ const getFileUrlValue = async (fileName: string) => {
 };
 
 const useGetFileUrlValue = (fileName: string | undefined) => {
-  const [url, setUrl] = useState<string | null>(null);
+  const [resolvedFile, setResolvedFile] = useState<{
+    fileName: string;
+    url: string;
+  } | null>(null);
+
   useEffect(() => {
-    if (!fileName) setUrl(null);
-    else getFileUrlValue(fileName).then((v) => setUrl(v));
+    if (!fileName) return;
+
+    let cancelled = false;
+    let objectUrl: string | undefined;
+
+    getFileUrlValue(fileName).then((url) => {
+      objectUrl = url;
+      if (cancelled) URL.revokeObjectURL(url);
+      else setResolvedFile({ fileName, url });
+    });
+
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
   }, [fileName]);
-  return url;
+
+  return resolvedFile && resolvedFile.fileName === fileName
+    ? resolvedFile.url
+    : null;
 };
 
 export const ImageSelector: FC<{
@@ -122,14 +142,14 @@ export const ImageSelector: FC<{
           </Menu.Target>
           <Menu.Dropdown>
             <Menu.Item
-              icon={<IconClipboard size={14} />}
+              leftSection={<IconClipboard size={14} />}
               onClick={loadFromClipboard}
               translate={"yes"}
             >
               {t("components.FileSelector.image.menu.clipboard")}
             </Menu.Item>
             <Menu.Item
-              icon={<IconAlphabetLatin size={14} />}
+              leftSection={<IconAlphabetLatin size={14} />}
               onClick={loadFromImageCreator}
               translate={"yes"}
             >
@@ -191,7 +211,7 @@ export const AudioSelector: FC<{
           </Menu.Target>
           <Menu.Dropdown>
             <Menu.Item
-              icon={<IconMicrophone size={14} />}
+              leftSection={<IconMicrophone size={14} />}
               onClick={() =>
                 showRecorderModal(async (url) => {
                   if (!url) return;
