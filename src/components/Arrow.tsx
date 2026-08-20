@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { redrawArrow, state$ } from "../store/store";
 
@@ -17,7 +17,7 @@ export const Arrow: FC<{ from: string; to: string }> = ({ from, to }) => {
 
   const [inited, setInited] = useState(false);
 
-  const draw = () => {
+  const draw = useCallback(() => {
     const scale = state$.ui.scale.peek();
 
     const frame = document.getElementById("arrrow-frame");
@@ -44,16 +44,19 @@ export const Arrow: FC<{ from: string; to: string }> = ({ from, to }) => {
     });
 
     setInited(true);
-  };
+  }, [from, to]);
 
   useEffect(() => {
-    draw();
+    const initialDraw = requestAnimationFrame(draw);
     const cancel = redrawArrow.on(() => {
       setTimeout(() => draw(), 0);
     });
 
-    return () => cancel();
-  }, [from, to]);
+    return () => {
+      cancelAnimationFrame(initialDraw);
+      cancel();
+    };
+  }, [draw]);
 
   if (!inited) return null;
 

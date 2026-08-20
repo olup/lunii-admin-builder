@@ -8,7 +8,7 @@ import {
   IconUpload,
 } from "@tabler/icons-react";
 import { FC } from "react";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { resetState, state$ } from "../store/store";
 import { exportPack, showFilePicker } from "../utils/fs";
 import { importPack } from "../utils/import/importPack";
@@ -34,8 +34,8 @@ export const Header: FC = () => {
       onConfirm: () => resetState(),
     });
 
-  const {mutate: doImportPack, isLoading} = useMutation(
-    async () => {
+  const {mutate: doImportPack, isPending} = useMutation({
+    mutationFn: async () => {
       const file = await showFilePicker([
         {accept: {"application/zip": [".zip"]}},
       ]);
@@ -43,16 +43,14 @@ export const Header: FC = () => {
       const state = await importPack(file);
       state$.state.assign(state);
     },
-    {
-      onError: (e) => {
+    onError: (e) => {
         notifications.show({
           color: "red",
           title: t("common.error.unknown"),
           message: (e as Error).message,
         });
-      },
-    }
-  );
+    },
+  });
 
   const openImportModal = () =>
     modals.openConfirmModal({
@@ -88,7 +86,7 @@ export const Header: FC = () => {
         mr={5}
         variant="outline"
         color="gray"
-        rightIcon={<IconPlus size={18}/>}
+        rightSection={<IconPlus size={18}/>}
         onClick={() => {
           openResetModal();
         }}
@@ -100,9 +98,9 @@ export const Header: FC = () => {
         mr={5}
         variant="outline"
         color="gray"
-        rightIcon={<IconUpload size={18}/>}
+        rightSection={<IconUpload size={18}/>}
         onClick={() => openImportModal()}
-        loading={isLoading}
+        loading={isPending}
         translate={"yes"}
       >
         {t('components.Header.import.button')}
@@ -111,7 +109,7 @@ export const Header: FC = () => {
         mr={5}
         variant="outline"
         color="gray"
-        rightIcon={<IconDownload size={18}/>}
+        rightSection={<IconDownload size={18}/>}
         onClick={async () => {
           try {
             await exportPack(state$.state.peek());
@@ -132,7 +130,7 @@ export const Header: FC = () => {
       <Button
         variant="white"
         color="gray"
-        leftIcon={<IconExternalLink size={18} />}
+        leftSection={<IconExternalLink size={18} />}
         component="a"
         href="https://lunii-admin-web.pages.dev"
         target="_blank"

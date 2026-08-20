@@ -20,16 +20,13 @@ export const FileInput: FC<{
 
   return (
     <>
-      <Box onClick={handleClick} sx={{ cursor: "pointer" }} p={10} h="100%">
+      <Box onClick={handleClick} style={{ cursor: "pointer" }} p={10} h="100%">
         <Box
           h="100%"
-          sx={{
+          style={{
             border: "1px dashed",
             borderColor: "#ccc",
             borderRadius: 5,
-            "&:hover": {
-              borderColor: "#000",
-            },
           }}
         >
           {children}

@@ -137,7 +137,8 @@ export const Option: FC<{
               <Select
                 label={t("components.Option.story.select.label")}
                 value={option.onEnd}
-                onChange={(value: "stop" | "back" | "next") => {
+                onChange={(value) => {
+                  if (!value) return;
                   option$.onEnd.set(value);
                   state$.ui.defaultEndAction.set(value);
                 }}
@@ -165,10 +166,10 @@ export const Option: FC<{
           <Center w={300} mt={10}>
             <Button
               variant="filled"
-              sx={{ zIndex: 10 }}
+              style={{ zIndex: 10 }}
               size="xs"
               onClick={() => handleAddOption()}
-              rightIcon={<IconPlus size={15} />}
+              rightSection={<IconPlus size={15} />}
               color="gray"
               translate={"yes"}
             >

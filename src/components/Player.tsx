@@ -3,24 +3,30 @@ import {
   IconPlayerPauseFilled,
   IconPlayerPlayFilled,
 } from "@tabler/icons-react";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 
 export const Player: FC<{ url: string }> = ({ url }) => {
-  const [audio] = useState(new Audio());
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
-    audio.src = url;
+    const audio = new Audio(url);
+    audioRef.current = audio;
+    const handlePlay = () => setPlaying(true);
+    const handlePause = () => setPlaying(false);
+    const handleEnded = () => setPlaying(false);
+
     audio.load();
-    audio.addEventListener("play", () => setPlaying(true));
-    audio.addEventListener("pause", () => setPlaying(false));
-    audio.addEventListener("ended", () => setPlaying(false));
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handlePause);
+    audio.addEventListener("ended", handleEnded);
 
     return () => {
       audio.pause();
-      audio.removeEventListener("play", () => setPlaying(true));
-      audio.removeEventListener("pause", () => setPlaying(false));
-      audio.removeEventListener("ended", () => setPlaying(false));
+      audioRef.current = null;
+      audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("pause", handlePause);
+      audio.removeEventListener("ended", handleEnded);
     };
   }, [url]);
 
@@ -30,7 +36,10 @@ export const Player: FC<{ url: string }> = ({ url }) => {
       color="gray"
       size="xl"
       onClick={() => {
-        playing ? audio.pause() : audio.play();
+        const audio = audioRef.current;
+        if (!audio) return;
+        if (playing) audio.pause();
+        else void audio.play();
       }}
     >
       {playing ? <IconPlayerPauseFilled /> : <IconPlayerPlayFilled />}
