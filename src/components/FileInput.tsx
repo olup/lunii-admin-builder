@@ -1,5 +1,5 @@
 import { Box } from "@mantine/core";
-import React, { ChangeEvent, FC, ReactNode } from "react";
+import React, { type ChangeEvent, type FC, type ReactNode } from "react";
 
 export const FileInput: FC<{
   accept?: string;

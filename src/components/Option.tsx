@@ -9,8 +9,8 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import { FC } from "react";
-import { NodeType, state$ } from "../store/store";
+import type { FC } from "react";
+import { type NodeType, state$ } from "../store/store";
 import { Arrow } from "./Arrow";
 import { AudioSelector, ImageSelector } from "./FileSelector";
 import { useTranslation } from "react-i18next";

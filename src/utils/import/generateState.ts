@@ -1,5 +1,5 @@
-import { NodeType, State } from "../../store/store";
-import { StudioPack } from "../../types";
+import type { NodeType, State } from "../../store/store";
+import type { StudioPack } from "../../types";
 
 const getOptionType = (pack: StudioPack, stageNodeUuid: string) => {
   const stageNode = pack.stageNodes.find(

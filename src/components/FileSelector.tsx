@@ -9,7 +9,7 @@ import {
   IconPhoto,
   IconX,
 } from "@tabler/icons-react";
-import { FC, useEffect, useState } from "react";
+import { type FC, useEffect, useState } from "react";
 import { getAssetDirectory, loadFile } from "../utils/fs";
 import { resizeImage } from "../utils/image";
 import { getImageFromClipboard } from "../utils/misc";

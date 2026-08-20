@@ -11,7 +11,7 @@ export const zipAssets = async (packObject: any) => {
   const fileHandles = await assets.values();
   for await (const handle of fileHandles) {
     const fileHandle = await (handle as FileSystemFileHandle).getFile();
-    zip.file("assets/" + handle.name, fileHandle);
+    zip.file(`assets/${handle.name}`, fileHandle);
   }
 
   zip.file("story.json", JSON.stringify(packObject));

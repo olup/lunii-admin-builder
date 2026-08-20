@@ -1,4 +1,4 @@
-import { NodeType, State } from "../store/store";
+import type { NodeType, State } from "../store/store";
 import { generate } from "./generate/generate";
 import { getRandomFileName } from "./misc";
 import { zipAssets } from "./zip";
@@ -39,7 +39,7 @@ export const exportPack = async (state: State) => {
   const filename = state.metadata.title
     .replace(/[^a-z0-9]/gi, "_")
     .toLowerCase();
-  saveAs(blob, filename + ".zip");
+  saveAs(blob, `${filename}.zip`);
 };
 
 export const loadFile = async (file: File | null): Promise<string> => {

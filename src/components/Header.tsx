@@ -7,7 +7,7 @@ import {
   IconPlus,
   IconUpload,
 } from "@tabler/icons-react";
-import { FC } from "react";
+import type { FC } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { resetState, state$ } from "../store/store";
 import { exportPack, showFilePicker } from "../utils/fs";

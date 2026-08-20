@@ -10,7 +10,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
     "preview": "vite preview",
     "toc": "i18next-resources-for-ts toc -i src/i18n/locales/en-GB -o ./src/@types/resources.ts"
   },
@@ -37,19 +38,14 @@
     "react-zoom-pan-pinch": "^4.0.4"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@biomejs/biome": "^2.5.9",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@types/wicg-file-system-access": "^2023.10.7",
     "@vitejs/plugin-react-swc": "^4.3.3",
-    "eslint": "^10.8.1",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.4",
-    "globals": "^17.11.0",
     "i18next-resources-for-ts": "^2.1.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.67.0",
+    "typescript": "^7.0.2",
     "vite": "^8.2.2"
   }
 }

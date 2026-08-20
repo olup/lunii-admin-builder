@@ -3,7 +3,7 @@ import {
   IconPlayerPauseFilled,
   IconPlayerPlayFilled,
 } from "@tabler/icons-react";
-import { FC, useEffect, useRef, useState } from "react";
+import { type FC, useEffect, useRef, useState } from "react";
 
 export const Player: FC<{ url: string }> = ({ url }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);

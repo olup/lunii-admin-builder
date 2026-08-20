@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { type FC, useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { redrawArrow, state$ } from "../store/store";
 
@@ -86,6 +86,7 @@ export const Arrow: FC<{ from: string; to: string }> = ({ from, to }) => {
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
       >
+        <title>Connection</title>
         <defs>
           <marker
             id="triangle"
